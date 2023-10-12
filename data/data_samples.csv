@@ -1,0 +1,6 @@
+Id,Location,Time,Description,Severity
+1,Unknown,2020-09-15 00:21:03.234522,Outdoor,H
+2,A,2020-09-15 00:21:03.527954,Indoor,L
+3,B,2020-09-15 00:20:56.899683,Roof,H
+4,C,2020-09-15 00:21:04.402278,Parking,L
+

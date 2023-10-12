@@ -1,0 +1,26 @@
+name: flask
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.8
+  - pip
+  - git
+  - jupyterlab
+  - pandas
+  - pillow
+  - matplotlib
+  - tqdm
+  - pytest
+  - opencv
+  - pip:
+    - flask-restx==1.1.0
+    - flask-cors
+    - tensorboard
+
+# conda create --name flask --clone flask
+# conda env create -n flask --file environment.yml --force
+# conda env update -n flask --file environment.yml --prune
+# conda env remove -n flask
