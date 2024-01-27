@@ -1,6 +1,6 @@
 import json, os
 import logging
-import sys
+from dotenv import load_dotenv
 
 import werkzeug
 werkzeug.cached_property = werkzeug.utils.cached_property
@@ -52,6 +52,7 @@ dict_config = {
 log = logging.getLogger("rx")
 os.makedirs("../../logs", exist_ok=True)
 logging.config.dictConfig(dict_config)
+load_dotenv()  # take environment variables from .env.
 
 # -------------------------- #
 # Initialize the Application #

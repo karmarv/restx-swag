@@ -10,15 +10,13 @@ Swagger enabled Flask RESTX web services template project
     ```
 
 #### B. Server 
-
-- *Environment & Launch*
+- Configuration in `.flaskenv` file
+- *Launch Flask Server*
     ```
-    $ export $(xargs < .envrc) # Use this to configure the Application/AWS credentials
     $ cd src/rest
-    $ flask run --host=0.0.0.0 --port=5000
+    $ flask run 
     ```
-- App Instance
-    - REST API: http://localhost:5000
+- App instance at http://127.0.0.1:5000/
 
 
 #### C. Test 
