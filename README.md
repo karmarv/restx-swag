@@ -4,19 +4,9 @@ Swagger enabled Flask RESTX web services template project
 #### A. Environment Setup
 - [Miniconda3](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html) Windows/Server [Environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)
     ```
-    conda env remove -n flask
-    conda env create -n flask --file environment.yml --force
-    conda activate flask
-    ```
-- Issue that needs fix in your environment [Release Flask-RestX 1.1.0]
-    - https://github.com/python-restx/flask-restx/issues/567
-    - vim /Users/karmac/anaconda3/envs/flask/lib/python3.8/site-packages/flask_restx/api.py
-    ```
-    # Line number 20 update
-    try:
-        from flask.helpers import _endpoint_from_view_func
-    except ImportError:
-        from flask.sansio.scaffold import _endpoint_from_view_func
+    conda env remove -n restx
+    conda env create -n restx --file environment.yml --force
+    conda activate restx
     ```
 
 #### B. Server 
