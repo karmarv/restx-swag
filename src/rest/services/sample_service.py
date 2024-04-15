@@ -10,7 +10,8 @@ from flask_restx import reqparse
 from flask.logging import default_handler
 
 from rest.services import config
-from rest.services.data_service import init_sample_data
+from rest.services.data.sample_dao import init_sample_data
+from rest.services.data.database import setup_db
 
 log = logging.getLogger("rx")
 api = Namespace('sample', description='Operations related to Sample data')
@@ -94,6 +95,21 @@ class KpiList(Resource):
         """Returns list of KPI data sample grouped by 'Severity' column."""
         try:
             data = fetch_kpis()
+            response = make_response(data.to_json(orient='split'))
+            response.mimetype = 'application/json'
+            return response
+        except KeyError as e:
+            api.abort(500, e.__doc__, status = "Could not retrieve information", statusCode = "500")
+        except Exception as e:
+            api.abort(400, e.__doc__, status = "Could not retrieve information", statusCode = "400")
+
+@api.route('/db')
+class DbList(Resource):
+    @api.doc('get_db')
+    def get(self):
+        """Configure database."""
+        try:
+            data = setup_db()
             response = make_response(data.to_json(orient='split'))
             response.mimetype = 'application/json'
             return response

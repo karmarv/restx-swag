@@ -1,44 +1,27 @@
 # RESTX-Swagger Application
 Swagger enabled Flask RESTX web services template project
 
-#### A. Environment Setup
-- [Miniconda3](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html) Windows/Server [Environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)
+#### Environment Setup
+- Installation via Miniconda v24.3.0 - https://docs.conda.io/projects/miniconda/en/latest/
     ```
     conda env remove -n restx
-    conda env create -n restx --file environment.yml --force
+    conda create -n restx python=3.10
     conda activate restx
     ```
+- Clone the current codebase `git clone https://github.com/karmarv/restx-swag.git && cd restx-swag`
+- Install pre-requisite packages -  `pip install -r requirements.txt`
+- Download additional data [TODO]
 
-#### B. Server 
-- Configuration in `.flaskenv` file
-- *Launch Flask Server*
-    ```
-    $ cd src/rest
-    $ flask run 
-    ```
-- App instance at http://127.0.0.1:5000/
+#### Flask Server 
+- Server configuration in [.flaskenv](./.flaskenv) and [config.py](./src/rest/services/config.py) file
+- *Launch Flask Server*: `cd src/rest && flask run`
+    - App instance at http://127.0.0.1:5000/
+- *Test*: `cd src/rest && pytest`
+- *Data*: `./data/data_samples.csv`
 
-
-#### C. Test 
-- *Pytest-Flask in [src/tests](./src)*
-    ```
-    $ cd src/rest
-    $ pytest
-    ```
-#### D. Datasource 
-
-- **Data** : ./data/data_samples.csv
-
-#### E. Service URLs
-
+#### Service URLs
 Check the [Flask-RESTPlus & SwaggerUI](https://flask-restplus.readthedocs.io/en/stable/) documentation for more details
-
 - Swagger Descriptor (http://localhost:5000/swagger.json)
-
-| No | HTTP   | Parameters                               | REST Web Service Interface                                                |
-|:---| :------|:-----------------------------------------| :------------------------------------------------------------------------ |
-| 1  | GET    | query_time                               | 'http://localhost:5000/sample/?query_time=0-10&offset=0&limit=100'        |
-| 2  | GET    |                                          | 'http://localhost:5000/sample/kpis'                                       |
 
 These datasets can be consumed by [Highcharts](https://www.highcharts.com/demo) or any other application. 
 

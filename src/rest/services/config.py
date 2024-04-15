@@ -5,6 +5,10 @@ import pathlib
 APP_DEPLOYMENT_PATH = os.path.join(pathlib.Path(__file__).parent.absolute(),"..","..","..")
 
 # AWS Configuration 
+# TODO: Put in environment
+AWS_REGION = os.environ.get('region_name', 'us-west-2')
+AWS_ACCESS = os.environ.get('aws_access_key_id', 'x')
+AWS_SECRET = os.environ.get('aws_secret_access_key', 'x')
 
 # Formats
 FORMAT_DATE="%Y-%m-%d"
@@ -18,7 +22,8 @@ DATASTORE_FILES_ROOT = os.path.join(APP_DEPLOYMENT_PATH, "data")
 # Sample Service Data
 SAMPLE_DATA_CSV = os.path.join(DATASTORE_FILES_ROOT, "data_samples.csv")
 
-# Asset Service
-ASSET_IMG_S3_BUCKET_NAME = 'sample-data'
-ASSET_IMG_ALLOWED_EXTENSIONS = { 'png', 'jpg', 'jpeg', 'gif'}
-ASSET_IMG_UPLOAD_FOLDER = os.path.join(DATASTORE_FILES_ROOT, "uploads")
+# Image Service
+IMAGES_S3_BUCKET_NAME = 'sample-data'
+IMAGES_ALLOWED_EXTENSIONS = { 'png', 'jpg', 'jpeg', 'gif'}
+IMAGES_UPLOAD_FOLDER = os.path.join(DATASTORE_FILES_ROOT, "uploads")
+
