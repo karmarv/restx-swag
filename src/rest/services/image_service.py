@@ -45,7 +45,7 @@ def locate_save(file):
 # -------------------------------------- #
 reqp_up = reqparse.RequestParser()
 reqp_up.add_argument('file', location='files', default=None, required=False, type=FileStorage, help='Uploaded form-data image file. Eg: jpg, jpeg, png files')
-reqp_up.add_argument('filename',  type=str,  default=None,   required=False, help='Full image path in AWS S3 bucket data. Eg: rdd2020/train/Czech/images/Czech_000010.jpg OR https://mmm-data.s3-us-west-2.amazonaws.com/rdd2020/train/Czech/images/Czech_000006.jpg')
+#reqp_up.add_argument('filename',  type=str,  default=None,   required=False, help='Full image path in AWS S3 bucket data. Eg: rdd2020/train/Czech/images/Czech_000010.jpg OR https://mmm-data.s3-us-west-2.amazonaws.com/rdd2020/train/Czech/images/Czech_000006.jpg')
 reqp_up.add_argument('overwrite', type=bool, default=False,  required=False, help='Overwrite uploaded file if exists')
 
 
