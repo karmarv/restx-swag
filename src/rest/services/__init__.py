@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_restx import Api
 
-from .sample_service import api as ns_ss
+from .image_service import api as ns_is
 
 
 api = Api(version='1.0', 
@@ -11,4 +11,5 @@ api = Api(version='1.0',
 # ------------------------ #
 # Namespace configuration  #
 # ------------------------ #
-api.add_namespace(ns_ss)
+
+api.add_namespace(ns_is)

@@ -14,29 +14,43 @@ from flask_restx import Namespace, Resource, fields
 from flask_restx import reqparse
 from flask.logging import default_handler
 
-from rest.services import config
-import rest.services.data.image_dao as images
+from rest.services import config, utils
+from rest.services.data.model import db, Image, Serializer
 
 log = logging.getLogger("rx")
 api = Namespace('images', description='Operations related to Image data')
 
-#
-# Initialize the Sqlite Datastore
-#
+# Create an entry into the image metadata database
+def create_entry(fullpath, content):
+    new_img = None
+    if fullpath:
+        new_img = Image(
+            fullpath=fullpath,
+            content=content,
+        )  # Create an instance of the Image class
+        db.session.add(new_img)     # Adds new User record to database
+        db.session.commit()         # Commits all changes
+    return new_img
 
-
-
+# Locate and save to filesystem
+def locate_save(file):
+    log.info(file.filename)
+    filename = secure_filename(file.filename)
+    fullpath = os.path.join(config.IMAGES_UPLOAD_FOLDER, filename)
+    file.save(fullpath)
+    return fullpath
 
 # -------------------------------------- #
 # Parsers: Upload, Filter and Pagination #
 # -------------------------------------- #
 reqp_up = reqparse.RequestParser()
 reqp_up.add_argument('file', location='files', default=None, required=False, type=FileStorage, help='Uploaded form-data image file. Eg: jpg, jpeg, png files')
-reqp_up.add_argument('filename', type=str, default=None, required=False, help='Full image path in AWS S3 bucket mmm-data. Eg: rdd2020/train/Czech/images/Czech_000010.jpg OR https://mmm-data.s3-us-west-2.amazonaws.com/rdd2020/train/Czech/images/Czech_000006.jpg')
+reqp_up.add_argument('filename',  type=str,  default=None,   required=False, help='Full image path in AWS S3 bucket data. Eg: rdd2020/train/Czech/images/Czech_000010.jpg OR https://mmm-data.s3-us-west-2.amazonaws.com/rdd2020/train/Czech/images/Czech_000006.jpg')
+reqp_up.add_argument('overwrite', type=bool, default=False,  required=False, help='Overwrite uploaded file if exists')
+
 
 reqp_qr = reqparse.RequestParser()
 reqp_qr.add_argument('name',        type=str, default=None, required=False, help='(Eg: Czech_00001)Filter files list by name substring')
-reqp_qr.add_argument('segment_id',  type=str, default=None,     required=False, help='(Eg: 1510) Demand segmentation id relating to a polygon on map.')
 reqp_qr.add_argument('offset',      type=int, default=0,      required=False, help="(0) Starting index of the response")
 reqp_qr.add_argument('limit',       type=int, default=100,    required=False, help="Maximum size of the response. limit=0 for querying all dataset")
 
@@ -45,21 +59,17 @@ reqp_qr.add_argument('limit',       type=int, default=100,    required=False, he
 class ImageList(Resource):
     @api.expect(reqp_qr)
     def get(self):
-        # test: https://mmm-data.s3-us-west-2.amazonaws.com/rdd2020/train/Czech/images/Czech_000010.jpg
         """Returns list of asset image link based on name substring match."""
         try:
             args = reqp_qr.parse_args()
-            data = images.list(name_filter=args.get('name'),
-                                segment_id=args.get('segment_id'),
-                                offset=args.get('offset'),
-                                limit=args.get('limit'))
-            response = make_response(data.to_json(orient='split'))
+            imgs = Image.query.all()
+            response = make_response(Serializer.serialize_list(imgs))
             response.mimetype = 'application/json'
             return response
         except KeyError as e:
             api.abort(500, e.__doc__, status = "Could not retrieve information", statusCode = "500")
         except Exception as e:
-            api.abort(400, e.__doc__, status = "Could not retrieve information", statusCode = "400")
+            api.abort(400, e.__doc__, status = "Could not retrieve information"+str(e), statusCode = "400")
 
     @api.expect(reqp_up)
     def post(self):
@@ -67,18 +77,15 @@ class ImageList(Resource):
         try:
             args = reqp_up.parse_args()
             file = args.get('file')
-            filenames3 = args.get('filename')
-            if file and allowed_file(file.filename):
-                log.info(file.filename)
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(config.ASSET_IMG_UPLOAD_FOLDER, filename))
-                bboxes = detect_damages(image_path=os.path.join(config.ASSET_IMG_UPLOAD_FOLDER, filename), storage_type='local')
-                response = make_response(bboxes.to_json(orient='split'))
-                response.mimetype = 'application/json'
-                return response
-            elif filenames3 and allowed_file(filenames3):
-                bboxes = detect_damages(image_path=filenames3, storage_type='s3')
-                response = make_response(bboxes.to_json(orient='split'))
+            if file and utils.allowed_file(file.filename):
+                fullpath = locate_save(file)
+                existing_img = Image.query.filter(Image.fullpath == fullpath).first()
+                if existing_img and not args.get('overwrite'):
+                    response = make_response(existing_img.serialize())
+                    print("Image already exists: ", existing_img)
+                else:
+                    data = create_entry(fullpath, content="local")
+                    response = make_response(data.serialize())
                 response.mimetype = 'application/json'
                 return response
             else:
@@ -86,22 +93,6 @@ class ImageList(Resource):
         except KeyError as e:
             api.abort(500, e.__doc__, status = "Could not retrieve information", statusCode = "500")
         except Exception as e:
-            api.abort(400, e.__doc__, status = "Could not retrieve information", statusCode = "400")  
+            api.abort(400, e.__doc__, status = "Could not retrieve information"+str(e), statusCode = "400")  
        
 
-
-
-@api.route('/kpis')
-class KpiList(Resource):
-    @api.doc('get_kpi')
-    def get(self):
-        """Returns list of KPI data sample grouped by 'Severity' column."""
-        try:
-            data = fetch_kpis()
-            response = make_response(data.to_json(orient='split'))
-            response.mimetype = 'application/json'
-            return response
-        except KeyError as e:
-            api.abort(500, e.__doc__, status = "Could not retrieve information", statusCode = "500")
-        except Exception as e:
-            api.abort(400, e.__doc__, status = "Could not retrieve information", statusCode = "400")
