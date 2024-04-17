@@ -7,8 +7,9 @@ from rest.app import db
 from typing_extensions import Annotated
 from typing import Optional
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.inspection import inspect
 from sqlalchemy import func, select
+
+from rest.services.data import Serializer
 
 timestamp = Annotated[
     datetime.datetime,
@@ -19,12 +20,6 @@ timestamp = Annotated[
 # Data Model Objects #
 # ------------------ #
 
-class Serializer(object):
-    def serialize(self):
-        return {c: getattr(self, c) for c in inspect(self).attrs.keys()}
-    @staticmethod
-    def serialize_list(l):
-        return [m.serialize() for m in l]
 
 class ImageMetadata(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)

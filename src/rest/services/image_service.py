@@ -1,7 +1,5 @@
-import json, os
+import os
 import logging
-import sys, time
-import datetime
 import pandas as pd
 
 import werkzeug
@@ -9,13 +7,13 @@ werkzeug.cached_property = werkzeug.utils.cached_property
 from werkzeug.datastructures import FileStorage
 
 
-from flask import Flask, Response, jsonify, make_response, send_file
+from flask import make_response
 from flask_restx import Namespace, Resource, fields
 from flask_restx import reqparse
-from flask.logging import default_handler
 
 from rest.services import config, utils
-import rest.services.data.model as dbmodel
+from rest.services.auth_service import token_required
+import rest.services.data.image_metadata as dbmodel
 
 log = logging.getLogger("rx")
 api = Namespace('images', description='Operations related to Image data')
@@ -93,7 +91,8 @@ reqp_md_up.add_argument('overwrite',   type=bool, default=False,  required=False
 @api.route('/metadata')
 class ImageMetadata(Resource):
     @api.expect(reqp_md_qr)
-    def get(self):
+    @token_required
+    def get(self, current_user):
         """Returns list of asset image link based on name substring match."""
         try:
             args = reqp_md_qr.parse_args()
