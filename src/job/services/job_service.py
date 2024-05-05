@@ -2,59 +2,90 @@ import logging
 import werkzeug
 werkzeug.cached_property = werkzeug.utils.cached_property
 
-from flask import make_response
 from flask_restx import Namespace, Resource, fields
-from flask_restx import reqparse
 
-from job.services import config, utils
 
 log = logging.getLogger("job")
 api = Namespace('jobs', description='Operations related to Async/Sync job execution service')
 
 
 # -------------------------------------- #
+# Data Model and sample #
+# -------------------------------------- #
+
+job = api.model(
+    "Job", 
+    {
+        "name": fields.String(required=True, description="Job name"),
+        "type": fields.String(required=True, description="Algorithm to be executed"),
+        "data": fields.String(required=True, description="Data corresponding to this job run"),
+    }
+)
+
+job_list = api.model(
+    "JobList",
+    {
+        "id": fields.String(required=True, description="The job identifier"),
+        "job": fields.Nested(job, description="Job description"),
+    },
+)
+
+# TODO - Move this to a SQL database
+JOBS = {
+    "job11": { "name": "build an API", "type": "MBSP"},
+    "job22": { "name": "?????", "type": "Count", "data":"http://1.bp.blogspot.com/--M8WrSToFoo/VTVRut6u-2I/AAAAAAAAB8o/dVHTtpXitSs/s1600/URL.png"},
+    "task3": { "name": "profit!", "type": "Count"},
+}
+
+def abort_if_todo_doesnt_exist(job_id):
+    if job_id not in JOBS:
+        api.abort(404, "Job {} doesn't exist".format(job_id))
+
+
+
+# -------------------------------------- #
 # API Controllers and query param parser #
 # -------------------------------------- #
-reqp_md_qr = reqparse.RequestParser()
-reqp_md_qr.add_argument('name',        type=str, default=None, required=False, help='(Eg: .png) Filter files list by name substring from images table')
-reqp_md_qr.add_argument('offset',      type=int, default=0,      required=False, help="(0) Starting index of the response")
-reqp_md_qr.add_argument('limit',       type=int, default=100,    required=False, help="Maximum size of the response. limit=0 for querying all dataset")
 
-reqp_md_up = reqparse.RequestParser()
-reqp_md_up.add_argument('file',        type=str, default=None, required=False, help='full path to be entered as metadata to images table')
-reqp_md_up.add_argument('overwrite',   type=bool, default=False,  required=False, help='Overwrite uploaded file metadata if exists')
-
-@api.route('/async')
-class JobAsync(Resource):
-    @api.expect(reqp_md_qr)
-    def get(self):
-        """Returns list of jobs"""
-        try:
-            args = reqp_md_qr.parse_args()
-            data = {"message": "TODO"} #dbmodel.read_image_metadata(args.get('name'))
-            response = make_response(data)
-            response.mimetype = 'application/json'
-            return response
-        except KeyError as e:
-            api.abort(500, e.__doc__, status = "Could not retrieve information", statusCode = "500")
-        except Exception as e:
-            api.abort(400, e.__doc__, status = "Could not retrieve information"+str(e), statusCode = "400")
-
-    @api.expect(reqp_md_up)
-    def post(self):
-        """Create a new job request"""
-        try:
-            args = reqp_md_up.parse_args()
-            file_path = args.get('file')
-            if file_path and utils.allowed_file(file_path):
-                data = {} #dbmodel.create_image_metadata(file_path, content="local", overwrite=args.get('overwrite'))
-                response = make_response(data)
-                response.mimetype = 'application/json'
-                return response
-            else:
-                return "Unable to create " + file_path, 400
-        except KeyError as e:
-            api.abort(500, e.__doc__, status = "Could not retrieve information", statusCode = "500")
-        except Exception as e:
-            api.abort(400, e.__doc__, status = "Could not retrieve information"+str(e), statusCode = "400")  
+parser = api.parser()
+parser.add_argument(
+    "job", type=str, required=True, help="The job details", location="form"
+)
        
+
+@api.route("/async/<string:job_id>")
+@api.doc(responses={404: "Todo not found"}, params={"job_id": "The Job identifier"})
+class Job(Resource):
+    """Show a single job item and lets you delete them"""
+
+    @api.doc(description="job_id should be in {0}".format(", ".join(JOBS.keys())))
+    @api.marshal_with(job)
+    def get(self, job_id):
+        """Fetch a given resource"""
+        abort_if_todo_doesnt_exist(job_id)
+        return JOBS[job_id]
+
+    @api.doc(responses={204: "Todo deleted"})
+    def delete(self, job_id):
+        """Delete a given resource"""
+        abort_if_todo_doesnt_exist(job_id)
+        del JOBS[job_id]
+        return "", 204
+
+    @api.doc(parser=parser)
+    @api.marshal_with(job)
+    def put(self, job_id):
+        """Update a given resource"""
+        args = parser.parse_args()
+        task = {"name": args["job"]}
+        JOBS[job_id] = task
+        return task
+
+
+@api.route("/async")
+class JobList(Resource):
+    """Shows a list of all jobs"""
+    @api.marshal_list_with(job_list)
+    def get(self):
+        """List all jobs"""
+        return [{"id": id, "job": job} for id, job in JOBS.items()]

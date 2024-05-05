@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash
 
 
 
-from rest.app import db
+from rest import db
 from rest.services.data import Serializer
 from rest.services.exceptions import ValidationException
 

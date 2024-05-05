@@ -1,6 +1,6 @@
 
 
-import os
+import os, fnmatch
 import logging
 import time
 import pandas as pd
@@ -42,6 +42,21 @@ def locate_savefile(file, storage_type="local"):
     file.save(fullpath)
     return fullpath
 
+
+""" Load file from a local path """
+def find_file(filepath, storage_type="local"):
+    log.info("Search: {}, Storage Type: {}".format(filepath, storage_type))
+    if os.path.exists(filepath):
+        return filepath
+    elif os.path.exists(os.path.join(config.IMAGES_UPLOAD_FOLDER, filepath)):
+        return os.path.join(config.IMAGES_UPLOAD_FOLDER, filepath)
+    else:
+        # find images in upload folder and return first match
+        for root, dirs, files in os.walk(config.IMAGES_UPLOAD_FOLDER):
+            for name in files:
+                if fnmatch.fnmatch(name, filepath):
+                    return os.path.join(root, name)
+    return 
 
 """ Load image from a local path """
 def load_image(filepath, storage_type="local"):

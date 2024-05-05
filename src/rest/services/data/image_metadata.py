@@ -2,7 +2,7 @@
 import os
 import datetime
 import pandas as pd
-from rest.app import db
+from rest import db
 
 from typing_extensions import Annotated
 from typing import Optional

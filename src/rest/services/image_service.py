@@ -19,9 +19,6 @@ log = logging.getLogger("rx")
 api = Namespace('images', description='Operations related to Image data')
 
 
-
-
-
 # -------------------------------------- #
 # API Controllers and query param parser #
 # -------------------------------------- #
@@ -34,6 +31,8 @@ reqp_ib_up.add_argument('overwrite', type=bool, default=False, required=False, h
 reqp_ib_qr = reqparse.RequestParser()
 reqp_ib_qr.add_argument('name',        type=str, default=None, required=False, help='(Eg: .png) Download one image file object upon substring match in images table')
 
+
+
 @api.route('/blob')
 class ImageBlob(Resource):
     @api.expect(reqp_ib_qr)
@@ -42,17 +41,10 @@ class ImageBlob(Resource):
         try:
             args = reqp_ib_qr.parse_args()
             #data = dbmodel.read_image_metadata(args.get('name'))
-            filepath = args.get('name')
-            data_bin = utils.load_image(filepath)
-            if data_bin is None:
-                return make_response("Not Found", 404)
-            # Respond with data
-            filename = os.path.basename(filepath)
-            file_ext = os.path.splitext(filename)[1]
-            response = make_response(data_bin.tobytes())
-            response.headers.set('Content-Type', 'image/{}'.format(file_ext[1:]))
-            response.headers.set('Content-Disposition', 'attachment', filename=filename)
-            return response
+            filename = args.get('name')
+            filepath = utils.find_file(filename)
+            log.info("Found: {}".format(filepath))
+            return {"directory":os.path.dirname(filepath), "filename": os.path.basename(filepath)}
         except KeyError as e:
             api.abort(500, e.__doc__, status = "Could not retrieve information", statusCode = "500")
         except Exception as e:
@@ -91,8 +83,7 @@ reqp_md_up.add_argument('overwrite',   type=bool, default=False,  required=False
 @api.route('/metadata')
 class ImageMetadata(Resource):
     @api.expect(reqp_md_qr)
-    @token_required
-    def get(self, current_user):
+    def get(self):
         """Returns list of asset image link based on name substring match."""
         try:
             args = reqp_md_qr.parse_args()
@@ -106,7 +97,8 @@ class ImageMetadata(Resource):
             api.abort(400, e.__doc__, status = "Could not retrieve information"+str(e), statusCode = "400")
 
     @api.expect(reqp_md_up)
-    def post(self):
+    @token_required
+    def post(self, current_user):
         """Uploads a new file to the flask server."""
         try:
             args = reqp_md_up.parse_args()

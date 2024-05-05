@@ -12,7 +12,7 @@ from flask_cors import CORS
 from flask.logging import default_handler
 from logging.config import dictConfig
 
-from rest.services import config 
+from job import api, blueprint_v1
 
 # ------------ #
 # Setup Logger #
@@ -57,37 +57,13 @@ logging.config.dictConfig(dict_config)
 load_dotenv()  # take environment variables from .env.
 
 
-
-# -------------------------- #
-#  Initialize the Namespace  #
-# -------------------------- #
-from job.services.job_service import api as ns_js
-
-blueprint = Blueprint("api", __name__, url_prefix="/api/v1") # Blueprint not included due to error
-
-api = Api(version='1.0', 
-          title='Job web-service',
-          description='An unauthenticated job execution web services')
-
-api.add_namespace(ns_js)
-
-
 # ------------------------ #
 # Application Launch Conf  #
 # ------------------------ #
 def create_app():
     """ Create the flask application """
     app = Flask(__name__)
-    CORS(app)
-    log.info('Initializing flask web application (App)')
-    # Configure the app
-    app.config['MAX_CONTENT_LENGTH'] = 32 * 1024 * 1024
-    app.config["DEBUG"]              = True
-
-    app.app_context().push()
-    #app.register_blueprint(blueprint) # Blueprint not included due to error
-    api.init_app(app)
-    
+    app.register_blueprint(blueprint_v1)  
     return app
 
 ## Api 

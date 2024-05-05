@@ -46,7 +46,9 @@ class Register(Resource):
                                       message='6-64 symbols, required upper and lower case letters. Can contain !@#$%_')
 
         user = create_user(api.payload['username'], api.payload['password'])
-        response = make_response(user.serialize())
+        user_json = user.serialize()
+        user_json["password_hash"] = "[Hidden]"
+        response = make_response(user_json)
         return response
 
 
