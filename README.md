@@ -12,6 +12,10 @@ A Flask RESTX API with Swagger, JWT and SQLAlchemy integration
 - Install pre-requisite packages -  `pip install -r requirements.txt`
 - Download additional data [TODO]
 
+#### Docker
+- `docker-compose up -d --build`
+- `docker-compose down -v`
+
 #### Services
 - Server configuration in [.flaskenv](./.flaskenv) and [config.py](./src/rest/services/config.py) file
 - *Start Flask API*: `bash deploy_api.bash`
@@ -72,5 +76,6 @@ Check the unsecured backend Job services at http://127.0.0.1:5001/api/v1
 
 > References
 - [Flask-RESTPlus & SwaggerUI](https://flask-restplus.readthedocs.io/en/stable/) documentation for more details
-- https://github.com/blohinn/flask-restplus-full-todo-example-with-jwt/blob/develop/app/v1/resources/auth.py
-- These datasets can be consumed by [Highcharts](https://www.highcharts.com/demo) or any other application. 
+- [Flask Restx JWT authentication](https://github.com/blohinn/flask-restplus-full-todo-example-with-jwt/blob/develop/app/v1/resources/auth.py)
+- These datasets can be consumed by [Highcharts](https://www.highcharts.com/demo) or any other application.
+- A simple Redis Task queue https://realpython.com/flask-by-example-implementing-a-redis-task-queue/

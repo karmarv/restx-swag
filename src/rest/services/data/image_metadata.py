@@ -1,7 +1,6 @@
 """Data models."""
 import os
 import datetime
-import pandas as pd
 from rest import db
 
 from typing_extensions import Annotated

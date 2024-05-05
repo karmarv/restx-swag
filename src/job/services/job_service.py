@@ -1,9 +1,15 @@
+import os
 import logging
+import time
 import werkzeug
 werkzeug.cached_property = werkzeug.utils.cached_property
 
+from datetime import datetime
+from flask import make_response, request, jsonify
 from flask_restx import Namespace, Resource, fields
 
+from job.services import config
+import job.services.data.job_metadata as dbmodel
 
 log = logging.getLogger("job")
 api = Namespace('jobs', description='Operations related to Async/Sync job execution service')
@@ -16,70 +22,46 @@ api = Namespace('jobs', description='Operations related to Async/Sync job execut
 job = api.model(
     "Job", 
     {
-        "name": fields.String(required=True, description="Job name"),
-        "type": fields.String(required=True, description="Algorithm to be executed"),
-        "data": fields.String(required=True, description="Data corresponding to this job run"),
+        "id"    : fields.String(required=True, description="The job identifier"),
+        "name"  : fields.String(required=True, description="Job name"),
+        "type"  : fields.String(required=True, description="Algorithm to be executed"),
+        "data"  : fields.String(required=True, description="Data corresponding to this job run"),
+        "path"  : fields.String(required=True, description="Path where to lookup this data"),
+        "status": fields.String(required=True, description="Status of this job run"),
     }
 )
 
 job_list = api.model(
     "JobList",
     {
-        "id": fields.String(required=True, description="The job identifier"),
         "job": fields.Nested(job, description="Job description"),
     },
 )
-
-# TODO - Move this to a SQL database
-JOBS = {
-    "job11": { "name": "build an API", "type": "MBSP"},
-    "job22": { "name": "?????", "type": "Count", "data":"http://1.bp.blogspot.com/--M8WrSToFoo/VTVRut6u-2I/AAAAAAAAB8o/dVHTtpXitSs/s1600/URL.png"},
-    "task3": { "name": "profit!", "type": "Count"},
-}
-
-def abort_if_todo_doesnt_exist(job_id):
-    if job_id not in JOBS:
-        api.abort(404, "Job {} doesn't exist".format(job_id))
-
 
 
 # -------------------------------------- #
 # API Controllers and query param parser #
 # -------------------------------------- #
-
 parser = api.parser()
-parser.add_argument(
-    "job", type=str, required=True, help="The job details", location="form"
-)
+parser.add_argument("name", type=str, required=True, help="job name", location="form")
+parser.add_argument("type", type=str, required=True, help="job type", location="form")
+parser.add_argument("data", type=str, required=True, help="job data", location="form")
+parser.add_argument("path", type=str, required=True, help="job path", location="form")
+
        
 
 @api.route("/async/<string:job_id>")
 @api.doc(responses={404: "Todo not found"}, params={"job_id": "The Job identifier"})
 class Job(Resource):
     """Show a single job item and lets you delete them"""
-
-    @api.doc(description="job_id should be in {0}".format(", ".join(JOBS.keys())))
+    @api.doc(description="job_id must exist in database")
     @api.marshal_with(job)
     def get(self, job_id):
         """Fetch a given resource"""
-        abort_if_todo_doesnt_exist(job_id)
-        return JOBS[job_id]
-
-    @api.doc(responses={204: "Todo deleted"})
-    def delete(self, job_id):
-        """Delete a given resource"""
-        abort_if_todo_doesnt_exist(job_id)
-        del JOBS[job_id]
-        return "", 204
-
-    @api.doc(parser=parser)
-    @api.marshal_with(job)
-    def put(self, job_id):
-        """Update a given resource"""
-        args = parser.parse_args()
-        task = {"name": args["job"]}
-        JOBS[job_id] = task
-        return task
+        data = dbmodel.read_job_metadata(id=job_id)
+        response = make_response(data)
+        response.mimetype = 'application/json'
+        return response
 
 
 @api.route("/async")
@@ -88,4 +70,41 @@ class JobList(Resource):
     @api.marshal_list_with(job_list)
     def get(self):
         """List all jobs"""
-        return [{"id": id, "job": job} for id, job in JOBS.items()]
+        data = dbmodel.read_job_metadata()
+        response = make_response(data)
+        response.mimetype = 'application/json'
+        return response
+    
+    @api.doc(parser=parser)
+    @api.marshal_with(job)
+    def post(self):
+        """Create a given resource"""
+        args = parser.parse_args()
+        job = dbmodel.create_job_metadata(args.get('name'), args.get('type'),
+                                           args.get('data'), args.get('path'))
+        print(job)
+        response = make_response(job)
+        response.mimetype = 'application/json'
+        return response
+
+
+@api.route('/ping')
+class JobsPing(Resource):
+    def get(self):
+        """Ping server state and diagnostic info """
+        try:
+            data = { "type"       : config.APP_RELEASE_NAME,
+                     "version"    : config.APP_RELEASE_VERSION,
+                     "status"     : "Server uptime - {}".format(datetime.now() - config.SERVER_START_TIME),
+                     "serverTime" : time.strftime(config.FORMAT_DATETIME),
+                     "userAgent"  : request.user_agent.string,
+                     "cpuCount"   : os.cpu_count(),
+                     "clientAddr" : request.remote_addr
+                    }
+            log.info(data)
+            response = make_response(data)
+            response.mimetype = 'application/json'
+        except Exception as e:
+            log.error("Could not retrieve information. "+repr(e))
+            api.abort(500, e.__doc__, status = "Could not retrieve information. "+repr(e), statusCode = "500")  
+        return response

@@ -12,7 +12,8 @@ from flask_cors import CORS
 from flask.logging import default_handler
 from logging.config import dictConfig
 
-from job import api, blueprint_v1
+from job import db, blueprint_v1
+from job.services import config 
 
 # ------------ #
 # Setup Logger #
@@ -63,7 +64,20 @@ load_dotenv()  # take environment variables from .env.
 def create_app():
     """ Create the flask application """
     app = Flask(__name__)
-    app.register_blueprint(blueprint_v1)  
+    app.register_blueprint(blueprint_v1) 
+    CORS(app)
+    log.info('Initializing flask web application (App)')
+    app.config['MAX_CONTENT_LENGTH'] = 32 * 1024 * 1024
+    app.config['UPLOAD_FOLDER'] = config.IMAGES_UPLOAD_FOLDER
+    
+    # Configure the SQLite database and initialize Database Plugin
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + config.SQLALCHEMY_DATABASE_PATH     
+    app.config["DEBUG"]          = True
+
+    db.init_app(app)
+    with app.app_context():
+        # Create tables for our models
+        db.create_all()   
     return app
 
 ## Api 
