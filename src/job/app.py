@@ -1,5 +1,4 @@
 import os
-import jwt
 import logging
 from dotenv import load_dotenv
 
@@ -64,7 +63,8 @@ load_dotenv()  # take environment variables from .env.
 # -------------------------- #
 from job.services.job_service import api as ns_js
 
-api_bp = Blueprint("api", __name__, url_prefix="/api/v1") # Blueprint not included due to error
+blueprint = Blueprint("api", __name__, url_prefix="/api/v1") # Blueprint not included due to error
+
 api = Api(version='1.0', 
           title='Job web-service',
           description='An unauthenticated job execution web services')
@@ -85,8 +85,9 @@ def create_app():
     app.config["DEBUG"]              = True
 
     app.app_context().push()
+    #app.register_blueprint(blueprint) # Blueprint not included due to error
     api.init_app(app)
-    #app.register_blueprint(api_bp) # Blueprint not included due to error
+    
     return app
 
 ## Api 
