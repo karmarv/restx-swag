@@ -1,6 +1,7 @@
-# A Flask RESTX API with Swagger, JWT and SQLAlchemy integration
+# REST Webservices
+A Flask RESTX API with Swagger, JWT and SQLAlchemy integration
 
-#### Environment Setup
+#### Environment
 - Installation via Miniconda v24.3.0 - https://docs.conda.io/projects/miniconda/en/latest/
     ```
     conda env remove -n restx
@@ -11,16 +12,16 @@
 - Install pre-requisite packages -  `pip install -r requirements.txt`
 - Download additional data [TODO]
 
-#### Webservices Server 
+#### Services
 - Server configuration in [.flaskenv](./.flaskenv) and [config.py](./src/rest/services/config.py) file
 - *Start Flask API*: `bash deploy_api.bash`
-    - Secured API instance at http://127.0.0.1:5000/api/v1
-    - Unsecured backend Job services at http://127.0.0.1:5001/api/v1
+    - (1.) Secured API instance at http://127.0.0.1:5000/api/v1
+    - (2.) Unsecured backend Job services at http://127.0.0.1:5001/api/v1
 - *Stop or Shutdown*: `bash deploy_api.bash stop`
     - Shutdown all flask instances on this server
 
-#### Service URLs
-Check the [Flask-RESTPlus & SwaggerUI](https://flask-restplus.readthedocs.io/en/stable/) documentation for more details
+## 1. App Webservice - [./src/rest/](./src/rest/)
+Check the secured API instance at http://127.0.0.1:5000/api/v1
 - Swagger Descriptor (http://localhost:5000/api/v1/swagger.json)
 - Secured data access workflow using JWT authentication
     - Register a user
@@ -44,21 +45,32 @@ Check the [Flask-RESTPlus & SwaggerUI](https://flask-restplus.readthedocs.io/en/
         ```log
         {"level":"protected","uid":4}
         ```
+- Swagger UI based access
+    - Documentation UI for webservices
+        - [![Swagger UI](./data/assets/swagger-screenshot-jwt.png)](./data/assets/swagger-screenshot-jwt.png?raw=true "Swagger UI")
 
-These datasets can be consumed by [Highcharts](https://www.highcharts.com/demo) or any other application. 
+    - **Authorization**: Login and obtain the Bearer token to be filled in `Authorize` field on right top swagger documentation
+        - [![Auth](./data/assets/swagger-auth-bearer-jwt.png)](./data/assets/swagger-auth-bearer-jwt.png?raw=true "Swagger UI")
+    - Access the protected API from the test interface 
+        - [![Auth](./data/assets/swagger-auth-access.png)](./data/assets/swagger-auth-access.png?raw=true "Swagger UI")
+
+
+## 2. Job/Analytics Webservice - [./src/job/](./src/job/)
+Check the unsecured backend Job services at http://127.0.0.1:5001/api/v1
+
+- Job management services [IN-PROGRESS]
+    - List all jobs: `curl -X 'GET' 'http://127.0.0.1:5001/api/v1/jobs/async' -H 'accept: application/json'`
+        ```log
+        [{"id": "job11", "job": {"name": "build an API", "type": "MBSP", "data": null}}, {"id": "job22", "job": {"name": "?????", "type": "Count", "data": "http://1.bp.blogspot.com/--M8WrSToFoo/VTVRut6u-2I/AAAAAAAAB8o/dVHTtpXitSs/s1600/URL.png"}}, {"id": "task3", "job": {"name": "profit!", "type": "Count", "data": null}}]
+        ```
+
+- Swagger UI based access
+    - Documentation UI for Job management services
+        - [![Swagger UI](./data/assets/swagger-jobs-services.png)](./data/assets/swagger-obs-services.png?raw=true "Swagger UI")
 
 ---
 
-## Swagger
-- Documentation UI for webservices
-    - [![Swagger UI](./data/assets/swagger-screenshot-jwt.png)](./data/assets/swagger-screenshot-jwt.png?raw=true "Swagger UI")
-
-- **Authorization**: Login and obtain the Bearer token to be filled in `Authorize` field on right top swagger documentation
-    - [![Authh](./data/assets/swagger-auth-bearer-jwt.png)](./data/assets/swagger-auth-bearer-jwt.png?raw=true "Swagger UI")
-- Access the protected API from the test interface 
-    - [![Authh](./data/assets/swagger-auth-access.png)](./data/assets/swagger-auth-access.png?raw=true "Swagger UI")
-
-
----
-
-> Reference: https://github.com/blohinn/flask-restplus-full-todo-example-with-jwt/blob/develop/app/v1/resources/auth.py
+> References
+- [Flask-RESTPlus & SwaggerUI](https://flask-restplus.readthedocs.io/en/stable/) documentation for more details
+- https://github.com/blohinn/flask-restplus-full-todo-example-with-jwt/blob/develop/app/v1/resources/auth.py
+- These datasets can be consumed by [Highcharts](https://www.highcharts.com/demo) or any other application. 
