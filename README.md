@@ -1,5 +1,4 @@
-# RESTX-Swagger Application
-Swagger enabled Flask RESTX web services template project
+# A Flask RESTX API with Swagger, JWT and SQLAlchemy integration
 
 #### Environment Setup
 - Installation via Miniconda v24.3.0 - https://docs.conda.io/projects/miniconda/en/latest/
@@ -48,16 +47,18 @@ Check the [Flask-RESTPlus & SwaggerUI](https://flask-restplus.readthedocs.io/en/
 
 These datasets can be consumed by [Highcharts](https://www.highcharts.com/demo) or any other application. 
 
--- 
+---
 
 ## Swagger
+- Documentation UI for webservices
+    - [![Swagger UI](./data/assets/swagger-screenshot-jwt.png)](./data/assets/swagger-screenshot-jwt.png?raw=true "Swagger UI")
 
-[![Swagger UI](./data/assets/swagger-screenshot-jwt.png)](./data/assets/swagger-screenshot-jwt.png?raw=true "Swagger UI")
-
-- Authorization: Login and obtain the Bearer token to be filled in `Authorize` 
+- **Authorization**: Login and obtain the Bearer token to be filled in `Authorize` field on right top swagger documentation
     - [![Authh](./data/assets/swagger-auth-bearer-jwt.png)](./data/assets/swagger-auth-bearer-jwt.png?raw=true "Swagger UI")
 - Access the protected API from the test interface 
     - [![Authh](./data/assets/swagger-auth-access.png)](./data/assets/swagger-auth-access.png?raw=true "Swagger UI")
 
 
-Reference: https://github.com/blohinn/flask-restplus-full-todo-example-with-jwt/blob/develop/app/v1/resources/auth.py
+---
+
+> Reference: https://github.com/blohinn/flask-restplus-full-todo-example-with-jwt/blob/develop/app/v1/resources/auth.py
