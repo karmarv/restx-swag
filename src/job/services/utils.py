@@ -8,27 +8,22 @@ import numpy as np
 import urllib, cv2
 import boto3 
 
-import jwt
 from werkzeug.utils import secure_filename
 
 from rest.services import config 
 
-
-log = logging.getLogger("rx")
-
+log = logging.getLogger("job")
 
 #
 # Assets: In-memory Datastore
 #
 s3_bucket, s3_store_files_df = None, None
 
-
 # ------------------------- #
 # Configure the Data Utils  #
 # ------------------------- #
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in config.IMAGES_ALLOWED_EXTENSIONS
-
 
 # ----------------------------------- #
 #   Images and data file processing   #

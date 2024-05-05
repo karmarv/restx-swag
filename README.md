@@ -50,3 +50,6 @@ These datasets can be consumed by [Highcharts](https://www.highcharts.com/demo) 
 > Swagger UI
 
 [![Swagger UI](./data/swagger-screenshot.png)](./data/swagger-screenshot.png?raw=true "Swagger UI")
+
+
+Reference: https://github.com/blohinn/flask-restplus-full-todo-example-with-jwt/blob/develop/app/v1/resources/auth.py
