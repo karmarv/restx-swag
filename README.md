@@ -13,8 +13,20 @@ A Flask RESTX API with Swagger, JWT and SQLAlchemy integration
 - Download additional data [TODO]
 
 #### Docker
-- `docker-compose up -d --build`
-- `docker-compose down -v`
+- Install docker on AWS Linux Ec2 instance for Redis and Postgresql services
+  ```
+  sudo yum install -y docker vim tmux git mesa-libGL postgresql -y
+  sudo service docker start
+  sudo usermod -a -G docker ec2-user
+  sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  sudo chmod +x /usr/local/bin/docker-compose
+  ```
+  - Start :`docker-compose up -d --build`
+  - Logs  :`docker-compose logs`
+  - Stop  :`docker-compose down -v`
+- Access the services by their container name
+  - Postgres: `sudo docker exec -it restx-swag-postgres_db-1 psql -U restx -d restxdb`
+  - Redis: `sudo docker exec -it restx-swag-redis_db-1 redis-cli`
 
 #### Services
 - Server configuration in [.flaskenv](./.flaskenv) and [config.py](./src/rest/services/config.py) file
