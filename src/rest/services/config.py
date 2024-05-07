@@ -1,7 +1,9 @@
 import os
 import pathlib
 
-# App configs
+# Application configurations
+APP_RELEASE_NAME = "App Services"
+APP_RELEASE_VERSION = "v0.1"
 APP_DEPLOYMENT_PATH = os.path.join(pathlib.Path(__file__).parent.absolute(),"..","..","..")
 
 # JWT and Security
@@ -29,6 +31,7 @@ FORMAT_DATETIME="%Y-%m-%dT%H:%M:%S"
 # Data files
 DATASTORE_FILES_ROOT = os.path.join(APP_DEPLOYMENT_PATH, "data")
 SQLALCHEMY_DATABASE_PATH =  os.path.join(DATASTORE_FILES_ROOT, 'database.db')
+SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI", "sqlite:///" + SQLALCHEMY_DATABASE_PATH)
 
 # Sample Service Data
 SAMPLE_DATA_CSV = os.path.join(DATASTORE_FILES_ROOT, "data_samples.csv")

@@ -5,12 +5,12 @@ from datetime import datetime
 # Application configurations
 APP_RELEASE_NAME = "Job Management Services"
 APP_RELEASE_VERSION = "v0.1"
-APP_DEPLOYMENT_PATH = str(os.getenv('APP_DEPLOYMENT_PATH', os.path.join(pathlib.Path(__file__).parent.absolute(),"..","..","..")))
+APP_DEPLOYMENT_PATH = os.path.join(pathlib.Path(__file__).parent.absolute(),"..","..","..")
 
 # AWS Configuration: TODO Put in environment
-AWS_REGION_NAME = os.environ.get('region_name', 'us-west-2')
-AWS_ACCESS_KEY  = os.environ.get('aws_access_key_id', 'x')
-AWS_SECRET_KEY  = os.environ.get('aws_secret_access_key', 'x')
+AWS_REGION_NAME = os.getenv('region_name', 'us-west-2')
+AWS_ACCESS_KEY  = os.getenv('aws_access_key_id', 'x')
+AWS_SECRET_KEY  = os.getenv('aws_secret_access_key', 'x')
 
 # Flask Server State
 SERVER_START_TIME = datetime.now()
@@ -33,6 +33,7 @@ FORMAT_DATETIME="%Y-%m-%dT%H:%M:%S"
 # Data files
 DATASTORE_FILES_ROOT = os.path.join(APP_DEPLOYMENT_PATH, "data")
 SQLALCHEMY_DATABASE_PATH =  os.path.join(DATASTORE_FILES_ROOT, 'database.db')
+SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI", "sqlite:///" + SQLALCHEMY_DATABASE_PATH)
 
 # Sample Service Data
 SAMPLE_DATA_CSV = os.path.join(DATASTORE_FILES_ROOT, "data_samples.csv")

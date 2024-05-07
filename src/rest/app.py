@@ -71,7 +71,7 @@ def create_app():
     app.config['UPLOAD_FOLDER'] = config.IMAGES_UPLOAD_FOLDER
     
     # Configure the SQLite database and initialize Database Plugin
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + config.SQLALCHEMY_DATABASE_PATH
+    app.config["SQLALCHEMY_DATABASE_URI"] = config.SQLALCHEMY_DATABASE_URI
     app.config["SECRET_KEY"]     = config.JWT_SECRET_KEY
     app.config["JWT_SECRET_KEY"] = config.JWT_SECRET_KEY
     app.config["DEBUG"]          = True
