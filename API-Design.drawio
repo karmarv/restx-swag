@@ -1,0 +1,103 @@
+<mxfile host="app.diagrams.net" modified="2024-05-08T16:19:38.451Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" etag="YhKKCfU3EXqApM_EbCTM" version="23.1.1" type="device">
+  <diagram id="0fm1V3gpGBUPN75esr2h" name="API-Design">
+    <mxGraphModel dx="1338" dy="2011" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="MBYpIpwVIwdh6pM_XjQK-5" value="REST Web Services (Example Demo Structure)" style="shape=table;childLayout=tableLayout;startSize=40;collapsible=0;recursiveResize=0;expand=0;fontSize=16;" parent="1" vertex="1">
+          <mxGeometry x="50" y="-879" width="1070" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="MBYpIpwVIwdh6pM_XjQK-6" value="Security" style="shape=tableRow;horizontal=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;strokeColor=inherit;bottom=0;right=0;dropTarget=0;fontStyle=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;startSize=40;collapsible=0;recursiveResize=0;expand=0;fontSize=16;" parent="MBYpIpwVIwdh6pM_XjQK-5" vertex="1">
+          <mxGeometry y="40" width="1070" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="MBYpIpwVIwdh6pM_XjQK-7" value="Service" style="swimlane;swimlaneHead=0;swimlaneBody=0;fontStyle=0;strokeColor=inherit;connectable=0;fillColor=none;startSize=40;collapsible=0;recursiveResize=0;expand=0;fontSize=16;" parent="MBYpIpwVIwdh6pM_XjQK-6" vertex="1">
+          <mxGeometry x="40" width="320" height="120" as="geometry">
+            <mxRectangle width="320" height="120" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MBYpIpwVIwdh6pM_XjQK-21" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;/auth/register&lt;br style=&quot;border-color: var(--border-color); padding: 0px; margin: 0px;&quot;&gt;/auth/login&lt;br&gt;/auth/refresh&lt;br&gt;&lt;/font&gt;" style="text;whiteSpace=wrap;html=1;" parent="MBYpIpwVIwdh6pM_XjQK-7" vertex="1">
+          <mxGeometry x="10" y="48" width="319" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MBYpIpwVIwdh6pM_XjQK-8" value="Function" style="swimlane;swimlaneHead=0;swimlaneBody=0;fontStyle=0;strokeColor=inherit;connectable=0;fillColor=none;startSize=40;collapsible=0;recursiveResize=0;expand=0;fontSize=16;" parent="MBYpIpwVIwdh6pM_XjQK-6" vertex="1">
+          <mxGeometry x="360" width="380" height="120" as="geometry">
+            <mxRectangle width="380" height="120" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TQDbijYMmBsKwVDYC3Qz-5" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;Onboard a user for API access with JWT auth.&lt;br&gt;[TODO] Roles/Privileges, multiple APIs access&lt;/font&gt;" style="text;whiteSpace=wrap;html=1;" parent="MBYpIpwVIwdh6pM_XjQK-8" vertex="1">
+          <mxGeometry x="5" y="48" width="330" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MBYpIpwVIwdh6pM_XjQK-9" value="Data" style="swimlane;swimlaneHead=0;swimlaneBody=0;fontStyle=0;strokeColor=inherit;connectable=0;fillColor=none;startSize=40;collapsible=0;recursiveResize=0;expand=0;fontSize=16;" parent="MBYpIpwVIwdh6pM_XjQK-6" vertex="1">
+          <mxGeometry x="740" width="330" height="120" as="geometry">
+            <mxRectangle width="330" height="120" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TQDbijYMmBsKwVDYC3Qz-4" value="&lt;span style=&quot;font-size: 16px;&quot;&gt;User registered with access for App API. &lt;br&gt;&lt;br&gt;&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" parent="MBYpIpwVIwdh6pM_XjQK-9" vertex="1">
+          <mxGeometry x="10" y="51" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MBYpIpwVIwdh6pM_XjQK-10" value="App/API" style="shape=tableRow;horizontal=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;strokeColor=inherit;bottom=0;right=0;dropTarget=0;fontStyle=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;startSize=40;collapsible=0;recursiveResize=0;expand=0;fontSize=16;" parent="MBYpIpwVIwdh6pM_XjQK-5" vertex="1">
+          <mxGeometry y="160" width="1070" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="MBYpIpwVIwdh6pM_XjQK-11" value="" style="swimlane;swimlaneHead=0;swimlaneBody=0;fontStyle=0;connectable=0;strokeColor=inherit;fillColor=none;startSize=0;collapsible=0;recursiveResize=0;expand=0;fontSize=16;align=left;spacing=6;" parent="MBYpIpwVIwdh6pM_XjQK-10" vertex="1">
+          <mxGeometry x="40" width="320" height="120" as="geometry">
+            <mxRectangle width="320" height="120" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MBYpIpwVIwdh6pM_XjQK-20" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;{GET, POST} /images/metadata&lt;br style=&quot;border-color: var(--border-color); padding: 0px; margin: 0px;&quot;&gt;{GET, POST} /images/blob&lt;br&gt;...&lt;br&gt;&lt;/font&gt;" style="text;whiteSpace=wrap;html=1;" parent="MBYpIpwVIwdh6pM_XjQK-11" vertex="1">
+          <mxGeometry x="10" y="30" width="330" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MBYpIpwVIwdh6pM_XjQK-12" value="" style="swimlane;swimlaneHead=0;swimlaneBody=0;fontStyle=0;connectable=0;strokeColor=inherit;fillColor=none;startSize=0;collapsible=0;recursiveResize=0;expand=0;fontSize=16;" parent="MBYpIpwVIwdh6pM_XjQK-10" vertex="1">
+          <mxGeometry x="360" width="380" height="120" as="geometry">
+            <mxRectangle width="380" height="120" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MBYpIpwVIwdh6pM_XjQK-22" value="&lt;span style=&quot;font-size: 16px;&quot;&gt;Image blob upload and download endpoint&lt;br&gt;[TODO] Search of filter criteria like dates, geometry, bands for querying&amp;nbsp;&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" parent="MBYpIpwVIwdh6pM_XjQK-12" vertex="1">
+          <mxGeometry x="10" y="30" width="320" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MBYpIpwVIwdh6pM_XjQK-13" value="" style="swimlane;swimlaneHead=0;swimlaneBody=0;fontStyle=0;connectable=0;strokeColor=inherit;fillColor=none;startSize=0;collapsible=0;recursiveResize=0;expand=0;fontSize=16;verticalAlign=middle;align=left;spacingTop=0;spacingLeft=0;spacing=6;" parent="MBYpIpwVIwdh6pM_XjQK-10" vertex="1">
+          <mxGeometry x="740" width="330" height="120" as="geometry">
+            <mxRectangle width="330" height="120" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="MBYpIpwVIwdh6pM_XjQK-19" value="&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 16px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(251, 251, 251); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; float: none; display: inline !important;&quot;&gt;Local folder on server for JPG, PNG images&lt;br&gt;[TODO] GEE - Sentinel 2 MSI ,&lt;/span&gt;&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 16px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(251, 251, 251); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; float: none; display: inline !important;&quot;&gt;&amp;nbsp;LandSat 7,8,9&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" parent="MBYpIpwVIwdh6pM_XjQK-13" vertex="1">
+          <mxGeometry x="10" y="30" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MBYpIpwVIwdh6pM_XjQK-14" value="Jobs/Analytics" style="shape=tableRow;horizontal=0;swimlaneHead=0;swimlaneBody=0;top=0;left=0;strokeColor=inherit;bottom=0;right=0;dropTarget=0;fontStyle=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;startSize=40;collapsible=0;recursiveResize=0;expand=0;fontSize=16;" parent="MBYpIpwVIwdh6pM_XjQK-5" vertex="1">
+          <mxGeometry y="280" width="1070" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="MBYpIpwVIwdh6pM_XjQK-15" value="" style="swimlane;swimlaneHead=0;swimlaneBody=0;fontStyle=0;connectable=0;strokeColor=inherit;fillColor=none;startSize=0;collapsible=0;recursiveResize=0;expand=0;fontSize=16;" parent="MBYpIpwVIwdh6pM_XjQK-14" vertex="1">
+          <mxGeometry x="40" width="320" height="120" as="geometry">
+            <mxRectangle width="320" height="120" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TQDbijYMmBsKwVDYC3Qz-1" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;{GET, POST} /job/async&lt;br&gt;...&lt;br&gt;&lt;/font&gt;" style="text;whiteSpace=wrap;html=1;" parent="MBYpIpwVIwdh6pM_XjQK-15" vertex="1">
+          <mxGeometry x="10" y="20" width="319" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MBYpIpwVIwdh6pM_XjQK-16" value="" style="swimlane;swimlaneHead=0;swimlaneBody=0;fontStyle=0;connectable=0;strokeColor=inherit;fillColor=none;startSize=0;collapsible=0;recursiveResize=0;expand=0;fontSize=16;" parent="MBYpIpwVIwdh6pM_XjQK-14" vertex="1">
+          <mxGeometry x="360" width="380" height="120" as="geometry">
+            <mxRectangle width="380" height="120" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TQDbijYMmBsKwVDYC3Qz-2" value="&lt;span style=&quot;font-size: 16px;&quot;&gt;Create and get status on async job process&lt;br&gt;[TODO] Fetch results of job&amp;nbsp;&lt;br&gt;&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" parent="MBYpIpwVIwdh6pM_XjQK-16" vertex="1">
+          <mxGeometry x="10" y="30" width="370" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="MBYpIpwVIwdh6pM_XjQK-17" value="" style="swimlane;swimlaneHead=0;swimlaneBody=0;fontStyle=0;connectable=0;strokeColor=inherit;fillColor=none;startSize=0;collapsible=0;recursiveResize=0;expand=0;fontSize=16;" parent="MBYpIpwVIwdh6pM_XjQK-14" vertex="1">
+          <mxGeometry x="740" width="330" height="120" as="geometry">
+            <mxRectangle width="330" height="120" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TQDbijYMmBsKwVDYC3Qz-3" value="&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 16px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(251, 251, 251); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; float: none; display: inline !important;&quot;&gt;Background job submission to execute MBSP with GEE or Cow counting on local images&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" parent="MBYpIpwVIwdh6pM_XjQK-17" vertex="1">
+          <mxGeometry x="10" y="30" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="QRTmTXb4m05bQfmHPs-t-20" value="&lt;h1&gt;&lt;i&gt;Methane Mapper&lt;/i&gt;&lt;/h1&gt;&lt;b&gt;ANALYTICS &amp;amp; DASHBOARD&lt;/b&gt;&lt;br&gt;&lt;p&gt;(a.) SAAS&lt;span style=&quot;background-color: initial;&quot;&gt;&amp;nbsp;API and Data Services&lt;/span&gt;&lt;/p&gt;" style="text;html=1;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="50" y="-1080" width="350" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="BBYx57IpIgfwVpOjvS1V-1" value="" style="image;aspect=fixed;perimeter=ellipsePerimeter;html=1;align=center;shadow=0;dashed=0;spacingTop=3;image=img/lib/active_directory/database_server.svg;" parent="1" vertex="1">
+          <mxGeometry x="1379.5" y="-740" width="81" height="100.76" as="geometry" />
+        </mxCell>
+        <mxCell id="BBYx57IpIgfwVpOjvS1V-2" value="&lt;span style=&quot;font-size: 16px;&quot;&gt;Images: &lt;b&gt;JPG, PNG&lt;/b&gt;&lt;br&gt;&lt;br&gt;Database: &lt;b&gt;PostgreSQL&lt;br&gt;&lt;/b&gt;&lt;br&gt;Job Management: &lt;b&gt;Redis Task Queue&lt;/b&gt;&lt;br&gt;&lt;/span&gt;" style="text;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="1275" y="-641.24" width="240" height="161.24" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
