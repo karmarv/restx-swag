@@ -9,16 +9,6 @@
 export APP_DEPLOYMENT_PATH=$PWD/
 echo "App Deployment Path: ${APP_DEPLOYMENT_PATH}"
 
-export APP_DATASET_PATH="/data/uploads/videos"
-mkdir -p ${APP_DATASET_PATH}
-echo "App Dataset Path: ${APP_DATASET_PATH}"
-
-export REDIS_URL="redis://0.0.0.0:6379/0"
-echo "App Redis URL: ${REDIS_URL}"
-
-SERVER_LOG_FILE=$APP_DEPLOYMENT_PATH/logs/rest.log
-touch $SERVER_LOG_FILE
-
 
 WORKER_ID=0
 if [ "$#" -eq  "0" ]
@@ -37,4 +27,4 @@ echo ">> List existing workers"
 ps -eaf | grep /bin/rq
 
 echo ">> Launch RQ Worker -> #$WORKER_ID with log at $WORKER_LOG_FILE"
-cd $APP_DEPLOYMENT_PATH/src/job && rq worker  2>&1 | tee -a $WORKER_LOG_FILE
+cd $APP_DEPLOYMENT_PATH/src/ && rq worker  2>&1 | tee -a $WORKER_LOG_FILE

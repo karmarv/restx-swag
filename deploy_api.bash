@@ -12,31 +12,44 @@ echo "App Deployment Path: ${APP_LOCAL_PATH}"
 SERVER_LOG_FILE=$APP_LOCAL_PATH/logs/rest.log
 touch $SERVER_LOG_FILE
 
-function deploy_artifacts(){
-  echo "------ #0: Deploy Model/Weights (Flask) ------"
+function prepare_artifacts(){
+  echo "------ #1: Prepare Model/Weights ------"
   # [TODO] Copy anomaly weights to the params folder
   #cp descriptive/lookup_table.csv $APP_LOCAL_PATH/params/
 }
 
+function check_kill_process(){
+  FILE_PID_JOB=$HOME/pid-job.nohup
+  FILE_PID_RST=$HOME/pid-rest.nohup
+  if [ -f "$FILE_PID_JOB" ] || [ -f "$FILE_PID_RST" ]; then
+      echo "------ #0: Kill existing server (Flask) ------"
+      echo "$FILE_PID_JOB exists."
+      # Kill started flask process
+      kill -9 `cat $FILE_PID_JOB`
+      kill -9 `cat $FILE_PID_RST`
+      # Ultimately devastate flask processes
+      kill $(pgrep -f flask)
+  else 
+      echo "$FILE_PID_JOB does not exist."
+  fi
+  rm $FILE_PID_JOB
+  rm $FILE_PID_RST
+}
+
 if [ "$1" ]; then
   echo "Stop"
-  # Kill started flask process
-  kill -9 `cat $HOME/pid-rest.nohup`
-  kill -9 `cat $HOME/pid-job.nohup`
-  rm $HOME/pid-rest.nohup
-  rm $HOME/pid-job.nohup
-  # Ultimately devastate flask processes
-  kill $(pgrep -f flask)
+  check_kill_process
 else
   echo "Start and Deploy"
   # Copy and deploy artifacts for model execution
-  deploy_artifacts
-  echo "------ #1: Launch REST API ------"
+  prepare_artifacts
+  check_kill_process
+  echo "------ #2: Launch REST API ------"
   cd $APP_LOCAL_PATH/src/rest 
   nohup flask run --host=0.0.0.0 --port=5000   2>&1 | tee -a $SERVER_LOG_FILE &
   echo $! > $HOME/pid-rest.nohup
   
-  echo "------ #2: Launch REST API ------"
+  echo "------ #3: Launch REST API ------"
   cd $APP_LOCAL_PATH/src/job 
   nohup flask run --host=0.0.0.0 --port=5001   2>&1 | tee -a $SERVER_LOG_FILE &
   echo $! > $HOME/pid-job.nohup

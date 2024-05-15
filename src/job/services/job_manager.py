@@ -10,42 +10,30 @@ from rq import get_current_job
 from rq.job import Job
 
 from job.services import config
-from job.services.job_executor import run_job
+from algo.job_executor import run
 
-log = logging.getLogger("app")
+log = logging.getLogger("job")
 
 
-def submit_job(model):
+def submit_job(metadata):
     """ 
     Submit job to the Redis task queue for processing and persist the job state in KV store 
     """
     try:
-        job_id = "{}:{}".format(os.path.basename(model['videoInputPath']), str(uuid.uuid4()))
+        log.info("Submit: {}".format(metadata))
+        job_id = str(metadata['id'])
         with Connection(redis.from_url(config.REDIS_URL)):
             q = Queue()
-            job = q.enqueue(run_job, job_id, 
-                                        model['azureStorageCredentials'], 
-                                        model['videoInputPath'], 
-                                        model['videoOutputPath'], 
-                                        job_id=job_id, 
-                                        job_timeout=config.REDIS_JOB_TIMEOUT,
-                                        result_ttl=config.REDIS_JOB_TTL)
-
-        # Add this job to the redis data store Hash structure
-        with redis.Redis.from_url(url=config.REDIS_URL) as r:
-            db_key = "{}:{}".format(config.REDIS_JOB_PREFIX, job_id)
-            key_exists = r.exists(db_key) 
-            model['jobId']         = job_id
-            model['status']        = config.REDIS_JOB_STATUS[0]
-            model['jobStartTime']  = ""
-            model['jobFinishTime'] = ""
-            model['jobSubmissionTime'] = time.strftime(config.FORMAT_DATETIME) 
-            result = r.hmset(db_key, model)
-        log.info("Submitted Job: {}".format(model))
+            rqjob = q.enqueue(run, job_id, 
+                                    metadata, 
+                                    job_id=job_id, 
+                                    job_timeout=config.REDIS_JOB_TIMEOUT,
+                                    result_ttl=config.REDIS_JOB_TTL)
+        log.info("Submitted Job: {}".format(rqjob))
     except Exception as e:
         log.error("Job submission error. "+repr(e))
-        raise Exception("ERROR: Unable to submit Job !")
-    return
+        raise Exception("ERROR: Unable to submit Job !\n{}".format(metadata))
+    return 
 
 
 def get_job_status(job_id, offset, limit):
@@ -59,15 +47,10 @@ def get_job_status(job_id, offset, limit):
             job = Job.fetch(job_id, connection=conn)
             log.info('Status: {}, Job: {}'.format(job.get_status(), job))
 
-            # Get additional logs from database Hash store
-            with redis.Redis.from_url(url=config.REDIS_URL) as r:
-                db_key = "{}:{}".format(config.REDIS_JOB_PREFIX, job_id)
-                if not r.exists(db_key):
-                    raise Exception("ERROR: Unable to process Job - {}. Not found in Redis Database !".format(db_key))
-
-                # Job State - Start
-                log_debug = r.hget(db_key, 'log')
-                log_fail  = r.hget(db_key, 'error')
+            # Get additional logs from database store
+            # Job State - Start
+            log_debug = "None"
+            log_fail  = "None"
 
             jobs_data = { "jobId"                 : job_id,
                           "status"                : job.get_status(),

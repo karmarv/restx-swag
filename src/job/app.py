@@ -41,13 +41,13 @@ dict_config = {
         },
     },
     'loggers': {
-        'rx': {
+        'job': {
             'handlers': ["default"],
             'level': 'DEBUG',
         },
     },
     'root': {
-        'handlers': ["default", "console"],
+        'handlers': ["default"],
         'level': 'INFO',
     },
 }

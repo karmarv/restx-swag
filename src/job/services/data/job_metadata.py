@@ -62,9 +62,11 @@ def create_job_metadata(name, type, data, path, overwrite=False):
 def read_job_metadata(id=None, name=None):
     # check for filename match in query
     if id is not None:
-        jobs = JobMetadata.query.filter(JobMetadata.id==id).first()
+        job = JobMetadata.query.filter(JobMetadata.id==id).first()
+        return job.serialize()
     elif name is not None:
         jobs = JobMetadata.query.filter(JobMetadata.name.like(f'%{name}%')).all()
+        return Serializer.serialize_list(jobs)
     else:
         jobs = JobMetadata.query.all()
-    return Serializer.serialize_list(jobs)
+        return Serializer.serialize_list(jobs)
