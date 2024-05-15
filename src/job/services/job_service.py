@@ -8,7 +8,7 @@ from datetime import datetime
 from flask import make_response, request, jsonify
 from flask_restx import Namespace, Resource, fields
 
-from job.services import config
+from job.services import config, job_manager
 import job.services.data.job_metadata as dbmodel
 
 log = logging.getLogger("job")
@@ -80,8 +80,11 @@ class JobList(Resource):
     def post(self):
         """Create a given resource"""
         args = parser.parse_args()
+        job_manager.submit_job(job)
         job = dbmodel.create_job_metadata(args.get('name'), args.get('type'),
                                            args.get('data'), args.get('path'))
+        
+        
         print(job)
         response = make_response(job)
         response.mimetype = 'application/json'
