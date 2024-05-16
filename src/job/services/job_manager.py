@@ -36,7 +36,7 @@ def submit_job(metadata):
     return 
 
 
-def get_job_status(job_id, offset, limit):
+def get_job_status(job_id):
     """
     List all the tasks in queue for execution
     """
@@ -44,32 +44,26 @@ def get_job_status(job_id, offset, limit):
     if job_id:
         with Connection(redis.from_url(config.REDIS_URL)) as conn:
             # Get redis jobs
-            job = Job.fetch(job_id, connection=conn)
+            job = Job.fetch(id=job_id, connection=conn)
             log.info('Status: {}, Job: {}'.format(job.get_status(), job))
 
             # Get additional logs from database store
             # Job State - Start
             log_debug = "None"
             log_fail  = "None"
-
-            jobs_data = { "jobId"                 : job_id,
+            jobs_data = { 
                           "status"                : job.get_status(),
-                          "progress"              : "",
-                          "operationStartTime"    : job.created_at.strftime(config.FORMAT_DATETIME) if job.created_at is not None else None,
-                          "operationFinishTime"   : job.ended_at.strftime(config.FORMAT_DATETIME) if job.ended_at is not None else None,
-                          "failureReason"         : log_fail.decode() if log_fail is not None else None,
-                          "log"                   : log_debug.decode() if log_debug is not None else None
-                          #"arguments"             : job.args
+                          "time_created"          : job.created_at.strftime(config.FORMAT_DATETIME) if job.created_at is not None else None,
+                          "time_updated"          : job.ended_at.strftime(config.FORMAT_DATETIME) if job.ended_at is not None else None,
+                          "failureReason"         : log_fail if log_fail is not None else None,
+                          "log"                   : log_debug if log_debug is not None else None
                           }
-            """
             # Check Results 
-            for result in job.results(): 
-                print(result.created_at, result.type)
-                if result == result.Type.SUCCESSFUL: 
-                    log.info(result.return_value) 
-                else: 
-                    log.info(result.exc_string)
-            """
+            result = job.latest_result()
+            if result == result.Type.SUCCESSFUL: 
+                jobs_data["results"] = result.return_value
+            else: 
+                jobs_data["results"] = result.exc_string
     else:
         log.info("[TODO] Query all jobs")
         jobs_data = {}

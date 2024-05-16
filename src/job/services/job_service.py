@@ -28,6 +28,9 @@ job_meta = api.model(
         "data"  : fields.String(required=True, description="Data corresponding to this job run"),
         "path"  : fields.String(required=True, description="Path where to lookup this data"),
         "status": fields.String(required=True, description="Status of this job run"),
+        "result": fields.String(required=False, description="Result of this job run"),
+        "time_created": fields.String(required=False, description="Job created time"),
+        "time_updated": fields.String(required=False, description="Job completion/update time")
     }
 )
 
@@ -52,6 +55,12 @@ class Job(Resource):
     def get(self, job_id):
         """Fetch a given resource"""
         data = dbmodel.read_job_metadata(id=job_id)
+        results = job_manager.get_job_status(job_id)
+        data["status"] = results["status"]
+        data["result"] = results["results"]
+        data["time_created"] = results["time_created"]
+        data["time_updated"] = results["time_updated"]
+        log.info(results) 
         return data
 
 

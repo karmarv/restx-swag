@@ -6,8 +6,12 @@ import os
 # ------------ #
 # Setup/Config #
 # ------------ #
+REDIS_JOB_STATUS  = ["enqueued", "started", "running", "finished", "error"]
+
 log_worker_path = str(os.getenv('APP_LOG_PATH', "/tmp/restx/logs/"))
 os.makedirs(log_worker_path, exist_ok=True)
+
+
 """ 
     Print the log with timestamp 
 """
@@ -27,22 +31,32 @@ def run(job_id, job_metadata):
     - Download input video, image and Upload result files to accessible location
     """
     # Job State - Start
-    log_str = "{} - Job started; ".format(time)
+    job_metadata["status"] = REDIS_JOB_STATUS[1]
+    log_str = "{} - {} Job started  ".format(time, job_id)
     try:
         # Job Execute
+
         # Step 1: Wrap algorithm & execute as a sync process
         pprint("Execute worker job with metadata --> {}".format(job_metadata))
+        job_metadata["result"] = len(str(job_metadata["data"]))
+        job_metadata["content_type"] = "count"
+
         # Step 2: log status update in database
+        job_metadata["status"] = REDIS_JOB_STATUS[2]
         log_str = log_str + "{} - Initiate {}; ".format(time, job_metadata)
     except Exception as e:
         # Job Error: log exceptions and status in database
+        job_metadata["status"] = REDIS_JOB_STATUS[4]
         log_str = "{} - Failure {}; ".format(time, repr(e))
         pprint(log_str, "ERROR")
         raise e
-    finally:
-        # Job Cleanup
-        log_str = log_str + "{} - Job Completed; ".format(time)
-        pprint("Finally verify results --> {}".format(job_id))
+
+    # Job Cleanup
+    job_metadata["status"] = REDIS_JOB_STATUS[3]
+    log_str = log_str + "{} - Job Completed; ".format(time)
+    pprint("Job {} --> {}".format(job_metadata["content_type"], job_metadata["result"]))
 
     # Job State - End
+    # Update metadata with results information
+    job_metadata["time_updated"] = "{}".format(time)
     return job_metadata
