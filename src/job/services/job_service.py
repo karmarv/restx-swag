@@ -39,10 +39,10 @@ job_meta = api.model(
 # API Controllers and query param parser #
 # -------------------------------------- #
 parser = api.parser()
-parser.add_argument("module", type=str, required=True, location="form", default="worker.algo_search.run",  help="Specify the job handler python module name with function specification. Eg: module `worker.job_executor.run`")
-parser.add_argument("queue",  type=str, required=True, location="form", default="rq_algorun",              help="Determines the job queue selection. Options: `rq_algorun`, `rq_algo_count`, `rq_algo_detect`")
-parser.add_argument("data",   type=str, required=True, location="form", default="gaussian",                help="job data aassociated with the execution request. Options: String keywords, Serialized Json")
-parser.add_argument("path",   type=str, required=True, location="form", default="/tmp/restx/results/",     help="job path where result can be made available on server")
+parser.add_argument("module", type=str, required=True, location="form", default="worker.algo_search.run",  help="Specify the job handler python module name with function specification. Options: module `worker.algo_search.run`")
+parser.add_argument("queue",  type=str, required=True, location="form", default="rq_algorun",              help="Determines the job queue selection. Options: `rq_algorun`, `default` as per worker configurations")
+parser.add_argument("data",   type=str, required=True, location="form", default="gaussian",                help="job data aassociated with the execution request. Options: String `keywords` (for search), Serialized `Json` (for payload)")
+parser.add_argument("path",   type=str, required=True, location="form", default="/tmp/restx/results/",     help="job path where result can be made available on server. Options: local or mounted `filesystem`")
 
        
 
