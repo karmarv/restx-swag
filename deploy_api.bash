@@ -48,11 +48,13 @@ else
   cd $APP_LOCAL_PATH/src/rest 
   nohup flask run --host=0.0.0.0 --port=5000   2>&1 | tee -a $SERVER_LOG_FILE &
   echo $! > $HOME/pid-rest.nohup
+  echo "App Services: http://0.0.0.0:5000/api/v1/"
   
   echo "------ #3: Launch REST API ------"
   cd $APP_LOCAL_PATH/src/job 
   nohup flask run --host=0.0.0.0 --port=5001   2>&1 | tee -a $SERVER_LOG_FILE &
   echo $! > $HOME/pid-job.nohup
+  echo "Job Services: http://0.0.0.0:5001/api/v1/"
 fi
 
 # TODO - replace above with NGINX -> https://stackoverflow.com/questions/24941791/starting-flask-server-in-background

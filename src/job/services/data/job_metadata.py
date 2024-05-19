@@ -9,6 +9,7 @@ from sqlalchemy import func, select
 from job import db
 from job.services import config
 from job.services.data import Serializer
+from job.services.exceptions import JobException
 
 timestamp = Annotated[
     datetime.datetime,
@@ -20,8 +21,8 @@ timestamp = Annotated[
 # ------------------ #
 class JobMetadata(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(unique=False)
-    type: Mapped[str] = mapped_column(unique=False)
+    module: Mapped[str] = mapped_column(unique=False)
+    queue: Mapped[str] = mapped_column(unique=False)
     data: Mapped[str] = mapped_column(unique=False)
     path: Mapped[str] = mapped_column(unique=False, nullable=True)
     status: Mapped[Optional[str]]
@@ -40,33 +41,32 @@ class JobMetadata(db.Model):
 # Data Access Objects #
 # ------------------- #
 # Create an entry into the imagetable
-def create_job_metadata(name, type, data, path, overwrite=False):
-    new_job = None
-    exists = JobMetadata.query.filter(JobMetadata.name==name).first()
-    if exists and not overwrite:
-        print("Job already exists: ", exists)
-        return exists.serialize()
-    else:    
-        new_job = JobMetadata(
-            name=name,
-            type=type,
-            data=data,
-            path=path,
-            status=config.REDIS_JOB_STATUS[0],
-        )  # Create an instance of the Job class
-        db.session.add(new_job)     # Adds new User record to database
-        db.session.commit()         # Commits all changes
+def create_job_metadata(module, queue, data, path, overwrite=False):
+    new_job = JobMetadata(
+        module=module,
+        queue=queue,
+        data=data,
+        path=path,
+        status=config.REDIS_JOB_STATUS[0],
+    )  # Create an instance of the Job class
+    db.session.add(new_job)     # Adds new User record to database
+    db.session.commit()         # Commits all changes
     return new_job.serialize()
 
 # Read entries from job metadata table
-def read_job_metadata(id=None, name=None):
+def read_job_metadata(id=None, module=None):
     # check for filename match in query
     if id is not None:
         job = JobMetadata.query.filter(JobMetadata.id==id).first()
         return job.serialize()
-    elif name is not None:
-        jobs = JobMetadata.query.filter(JobMetadata.name.like(f'%{name}%')).all()
+    elif module is not None:
+        jobs = JobMetadata.query.filter(JobMetadata.module.like(f'%{module}%')).all()
         return Serializer.serialize_list(jobs)
     else:
         jobs = JobMetadata.query.all()
         return Serializer.serialize_list(jobs)
+
+# Delete an entry from job metadata table
+def delete_job_metadata(job_id):
+
+    return

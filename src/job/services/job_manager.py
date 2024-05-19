@@ -1,19 +1,18 @@
 
 import os
-import time
+import json
 import uuid
 import logging
 
 import redis
 from rq import Queue, Connection
+from rq.serializers import JSONSerializer
 from rq import get_current_job
 from rq.job import Job
 
 from job.services import config
-from algo.job_executor import run
 
 log = logging.getLogger("job")
-
 
 def submit_job(metadata):
     """ 
@@ -22,13 +21,14 @@ def submit_job(metadata):
     try:
         log.info("Submit: {}".format(metadata))
         job_id = str(metadata['id'])
+        job_queue = str(metadata['queue'])
+        job_module = str(metadata['module'])
         with Connection(redis.from_url(config.REDIS_URL)):
-            q = Queue()
-            rqjob = q.enqueue(run, job_id, 
-                                    metadata, 
-                                    job_id=job_id, 
-                                    job_timeout=config.REDIS_JOB_TIMEOUT,
-                                    result_ttl=config.REDIS_JOB_TTL)
+            q = Queue(job_queue, serializer=JSONSerializer)
+            rqjob = q.enqueue(job_module, metadata, 
+                                   job_id=job_id, 
+                                   job_timeout=config.REDIS_JOB_TIMEOUT,
+                                   result_ttl=config.REDIS_JOB_TTL)
         log.info("Submitted Job: {}".format(rqjob))
     except Exception as e:
         log.error("Job submission error. "+repr(e))
@@ -44,7 +44,7 @@ def get_job_status(job_id):
     if job_id:
         with Connection(redis.from_url(config.REDIS_URL)) as conn:
             # Get redis jobs
-            job = Job.fetch(id=job_id, connection=conn)
+            job = Job.fetch(id=job_id, connection=conn, serializer=JSONSerializer)
             log.info('Status: {}, Job: {}'.format(job.get_status(), job))
 
             # Get additional logs from database store

@@ -42,7 +42,7 @@ dict_config = {
     },
     'loggers': {
         'job': {
-            'handlers': ["default"],
+            'handlers': ["default", "console"],
             'level': 'DEBUG',
         },
     },

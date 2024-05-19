@@ -1,6 +1,9 @@
 
-import time
 import os
+import json
+import time
+import requests
+
 
 
 # ------------ #
@@ -18,12 +21,17 @@ os.makedirs(log_worker_path, exist_ok=True)
 def pprint(log_text, log_type="INFO", log_name="JQ"):
     print("[{}] [{}][{}] - {}".format(time.strftime("%Y-%m-%dT%H:%M:%S"), log_name, log_type, log_text))
 
+def get_search_results(keystring):
+    params = {"q": "{}".format(keystring), "format": "json", "pretty": 1,"no_html": 1, "skip_disambig": 1}
+    ddgurl = "https://api.duckduckgo.com"
+    response = requests.get(url=ddgurl, params=params).json()
+    return response
 
 # ------------ #
 #  Entrypoint  #
 # ------------ #
 
-def run(job_id, job_metadata):
+def run(job_metadata):
     """
     Main entry point for analytics (Detection or MBSP)
     
@@ -31,6 +39,7 @@ def run(job_id, job_metadata):
     - Download input video, image and Upload result files to accessible location
     """
     # Job State - Start
+    job_id = job_metadata["id"]
     job_metadata["status"] = REDIS_JOB_STATUS[1]
     log_str = "{} - {} Job started  ".format(time, job_id)
     try:
@@ -38,8 +47,8 @@ def run(job_id, job_metadata):
 
         # Step 1: Wrap algorithm & execute as a sync process
         pprint("Execute worker job with metadata --> {}".format(job_metadata))
-        job_metadata["result"] = len(str(job_metadata["data"]))
-        job_metadata["content_type"] = "count"
+        job_metadata["result"] = get_search_results(job_metadata["data"])
+        job_metadata["content_type"] = "search"
 
         # Step 2: log status update in database
         job_metadata["status"] = REDIS_JOB_STATUS[2]
@@ -59,4 +68,6 @@ def run(job_id, job_metadata):
     # Job State - End
     # Update metadata with results information
     job_metadata["time_updated"] = "{}".format(time)
+
+    #data_json = json.dumps(job_metadata)
     return job_metadata

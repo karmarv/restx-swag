@@ -27,4 +27,4 @@ echo ">> List existing workers"
 ps -eaf | grep /bin/rq
 
 echo ">> Launch RQ Worker -> #$WORKER_ID with log at $WORKER_LOG_FILE"
-cd $APP_DEPLOYMENT_PATH/src/ && rq worker  2>&1 | tee -a $WORKER_LOG_FILE
+cd $APP_DEPLOYMENT_PATH/src/ && python worker/work.py  2>&1 | tee -a $WORKER_LOG_FILE
