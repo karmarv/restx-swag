@@ -75,6 +75,7 @@ def is_redis_available():
     Test Redis connectivity from web services 
     """
     try:
+        log.info("Testing connection to redis at {}".format(config.REDIS_URL))
         r = redis.from_url(config.REDIS_URL)
         r.ping()
         log.info("Successfully connected to redis at {}".format(config.REDIS_URL))
