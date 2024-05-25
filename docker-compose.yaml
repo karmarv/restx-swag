@@ -9,6 +9,7 @@ services:
     restart: on-failure:3
     volumes:
       - ./data/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - vol_pgdata:/var/lib/postgresql/data
     ports:
       - 5432:5432
     environment:
@@ -20,42 +21,30 @@ services:
   
   # Redis server
   redis_db:
-    image: redis:7.2.4-alpine
+    image: redis/redis-stack:7.2.0-v10
     hostname: redis
     restart: always
-    command: redis-server --save 60 1 --loglevel warning #--requirepass ${REDIS_PASSWORD}
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]    
     volumes:
-      - vol_redis:/var/lib/redis
-      - vol_redis_config:/usr/local/etc/redis/redis.conf
+      - vol_redis:/data
+      - vol_redisinsight:/redisinsight
     ports:
       - 6379:6379
+      - 8001:8001
     networks:
       - network_db
     depends_on:
       - postgres_db
   
-  # Redis GUI
-  redis_gui:
-    image: rediscommander/redis-commander:latest
-    restart: always
-    environment:
-      - REDIS_HOSTS=local:redis:6379
-      - HTTP_USER=restx
-      - HTTP_PASSWORD=restx123
-    ports:
-      - 8081:8081
-    networks:
-      - network_db
-    depends_on:
-      - redis_db
-
   # Flask Server [Yet to package]
 
 
 
 volumes:
+  vol_pgdata:
   vol_redis:
-  vol_redis_config:
+  vol_redisinsight:
 
 networks:
   network_db:
