@@ -56,7 +56,7 @@ def find_file(filepath, storage_type="local"):
             for name in files:
                 if fnmatch.fnmatch(name, filepath):
                     return os.path.join(root, name)
-    return 
+    return None
 
 """ Load image from a local path """
 def load_image(filepath, storage_type="local"):

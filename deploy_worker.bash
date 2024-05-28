@@ -9,6 +9,9 @@
 export APP_DEPLOYMENT_PATH=$PWD/
 echo "App Deployment Path: ${APP_DEPLOYMENT_PATH}"
 
+set -a # automatically export all variables
+source .flaskenv
+set +a
 
 WORKER_ID=0
 if [ "$#" -eq  "0" ]

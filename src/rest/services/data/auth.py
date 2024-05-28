@@ -1,5 +1,7 @@
 """Data models."""
-from typing import List
+import datetime
+from typing import List, Optional
+from sqlalchemy import func, select
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import Mapped, mapped_column
@@ -20,10 +22,11 @@ class User(db.Model): # Parent
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(unique=True)
     password_hash: Mapped[str] = mapped_column(unique=True)
-    
+    time_created: Mapped[Optional[datetime.datetime]] = mapped_column(nullable=False, server_default=func.CURRENT_TIMESTAMP())
+    time_updated: Mapped[Optional[datetime.datetime]] = mapped_column(nullable=False, server_default=func.CURRENT_TIMESTAMP())
+
     # relationship reference: https://docs.sqlalchemy.org/en/20/orm/basic_relationships.html#one-to-many
     refresh_tokens: Mapped[List["RefreshToken"]] = relationship()
-
 
     @property
     def password(self):
@@ -42,6 +45,8 @@ class RefreshToken(db.Model): # Child
     user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
     refresh_token: Mapped[str] = mapped_column(unique=True)
     user_agent_hash: Mapped[str] = mapped_column(unique=True)
+    time_created: Mapped[Optional[datetime.datetime]] = mapped_column(nullable=False, server_default=func.CURRENT_TIMESTAMP())
+    time_updated: Mapped[Optional[datetime.datetime]] = mapped_column(nullable=False, server_default=func.CURRENT_TIMESTAMP())
 
     def serialize(self):
         d = Serializer.serialize(self)
@@ -51,8 +56,8 @@ class RefreshToken(db.Model): # Child
 # Data Access Objects #
 # ------------------- #
     
-# Create an entry into the imagetable
 def create_user(username, password):
+    """Create an entry into the user table"""
     if User.query.filter_by(username=username).first():
         raise ValidationException(error_field_name='username', message='This username is already exists')
     user = User(username=username, password=password)

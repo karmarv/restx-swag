@@ -28,6 +28,7 @@ job_meta = api.model(
         "data"  : fields.String(required=True, description="Data corresponding to this job run"),
         "path"  : fields.String(required=True, description="Path where results can be made available"),
         "status": fields.String(required=True, description="Status of this job run"),
+        "tag"   : fields.String(required=False, description="Tag associated with this job run"),
         "result": fields.String(required=False, description="Result of this job run"),
         "time_created": fields.String(required=False, description="Job created time"),
         "time_updated": fields.String(required=False, description="Job completion/update time")
@@ -43,15 +44,15 @@ parser.add_argument("module", type=str, required=True, location="form", default=
 parser.add_argument("queue",  type=str, required=True, location="form", default="rq_algorun",              help="Determines the job queue selection. Options: `rq_algorun`, `default` as per worker configurations")
 parser.add_argument("data",   type=str, required=True, location="form", default="gaussian",                help="job data aassociated with the execution request. Options: String `keywords` (for search), Serialized `Json` (for payload)")
 parser.add_argument("path",   type=str, required=True, location="form", default="/tmp/restx/results/",     help="job path where result can be made available on server. Options: local or mounted `filesystem`")
+parser.add_argument("tag",    type=str, required=True, location="form", default="default",                 help="Tag name associated with this job request. Options: `default` collection")
 
        
 
 @api.route("/async/<string:job_id>")
 class Job(Resource):
-    """Retrieve a single job item and status"""
     @api.marshal_with(job_meta)
     def get(self, job_id):
-        """Fetch a given resource. job_id must exist in database"""
+        """Get a job metadata. job_id must exist in database"""
         data = dbmodel.read_job_metadata(id=job_id)
         results = job_manager.get_job_status(job_id)
         data["status"] = results["status"]
@@ -61,13 +62,17 @@ class Job(Resource):
         log.info(results) 
         return data
 
+    def delete(self, job_id):
+        """Delete a job metadata entry"""
+        dbmodel.delete_job_metadata(job_id)
+        return
+
 
 @api.route("/async")
 class JobList(Resource):
-    """List of all jobs from metadata table"""
     @api.marshal_list_with(job_meta)
     def get(self):
-        """List all jobs"""
+        """List of all jobs from metadata table"""
         data = dbmodel.read_job_metadata()
         return data
     
@@ -77,7 +82,7 @@ class JobList(Resource):
         """Submit a job request for processing"""
         args = parser.parse_args()
         job_new = dbmodel.create_job_metadata(args.get('module'), args.get('queue'),
-                                           args.get('data'), args.get('path'))
+                                           args.get('data'), args.get('path'), args.get('tag'))
         job_manager.submit_job(job_new)
         return job_new
 

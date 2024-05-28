@@ -37,6 +37,7 @@ class Register(Resource):
     @api.expect(register_model, validate=True)
     @api.response(400, 'username or password incorrect')
     def post(self):
+        """Register a user for the first time with username and password"""
         if not re.search(config.JWT_USERNAME_REGEXP, api.payload['username']):
             raise ValidationException(error_field_name='username',
                                       message='4-16 symbols, can contain A-Z, a-z, 0-9, _ \
@@ -59,7 +60,7 @@ class Login(Resource):
     @api.response(401, 'Incorrect username or password')
     def post(self):
         """
-        Login for aauthenticated access using token
+        Login for obtaining authorized access token
         This API implemented JWT. Token's payload contain:
         'uid' (user id),
         'exp' (expiration date of the token),
@@ -98,6 +99,7 @@ class Refresh(Resource):
     @api.expect(api.model('RefreshToken', {'refresh_token': fields.String(required=True)}), validate=True)
     @api.response(200, 'Success', return_token_model)
     def post(self):
+        """Refresh the access token for continued access"""
         _refresh_token = api.payload['refresh_token']
 
         try:
@@ -137,6 +139,7 @@ class Refresh(Resource):
 # Authentication Decorator  #
 # ------------------------- #
 def token_required(f):
+    """Decorator for authorizing the presented bearer access_token in header"""
     def wrapper(*args, **kwargs):
         auth_header = request.headers.get('Authorization')
         session_user = None
@@ -167,9 +170,9 @@ def token_required(f):
     return wrapper
 
 
-# This resource only for test
 @api.route('/protected')
 class Protected(Resource):
     @token_required
     def get(self, current_user):
+        """An access token based protected test resource for obtaining user identifier. This resource is for test only"""
         return make_response({'level': 'protected', 'uid': current_user.id})

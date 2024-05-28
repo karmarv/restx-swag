@@ -12,6 +12,10 @@ echo "App Deployment Path: ${APP_LOCAL_PATH}"
 SERVER_LOG_FILE=$APP_LOCAL_PATH/logs/rest.log
 touch $SERVER_LOG_FILE
 
+set -a # automatically export all variables
+source .flaskenv
+set +a
+
 function prepare_artifacts(){
   echo "------ #1: Prepare Model/Weights ------"
   # [TODO] Copy anomaly weights to the params folder

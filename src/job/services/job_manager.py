@@ -6,13 +6,23 @@ import logging
 
 import redis
 from rq import Queue, Connection
-from rq.serializers import JSONSerializer
 from rq import get_current_job
+from rq import Callback
 from rq.job import Job
 
 from job.services import config
 
 log = logging.getLogger("job")
+
+def report_success(job, connection, result, *args, **kwargs):
+    key = "rq:results:json:{}".format(job.id)
+    connection.set(key, json.dumps(result, default=str), ex=60)
+    pass
+
+def report_failure(job, connection, type, value, traceback):
+    key = "rq:results:failed:{}".format(job.id)
+    connection.set(key, str(traceback.format_exc()), ex=60)
+    pass
 
 def submit_job(metadata):
     """ 
@@ -24,17 +34,19 @@ def submit_job(metadata):
         job_queue = str(metadata['queue'])
         job_module = str(metadata['module'])
         with Connection(redis.from_url(config.REDIS_URL)):
-            q = Queue(job_queue, serializer=JSONSerializer)
+            q = Queue(job_queue)
             rqjob = q.enqueue(job_module, metadata, 
                                    job_id=job_id, 
-                                   job_timeout=config.REDIS_JOB_TIMEOUT,
-                                   result_ttl=config.REDIS_JOB_TTL)
+                                   #job_timeout=config.REDIS_JOB_TIMEOUT,
+                                   #result_ttl=config.REDIS_JOB_TTL,
+                                   on_success=Callback(report_success), # default callback timeout (60 seconds) 
+                                   on_failure=Callback(report_failure, timeout=10), # 10 seconds timeout
+                                   )
         log.info("Submitted Job: {}".format(rqjob))
     except Exception as e:
         log.error("Job submission error. "+repr(e))
         raise Exception("ERROR: Unable to submit Job !\n{}".format(metadata))
     return 
-
 
 def get_job_status(job_id):
     """
@@ -44,7 +56,7 @@ def get_job_status(job_id):
     if job_id:
         with Connection(redis.from_url(config.REDIS_URL)) as conn:
             # Get redis jobs
-            job = Job.fetch(id=job_id, connection=conn, serializer=JSONSerializer)
+            job = Job.fetch(id=job_id, connection=conn)
             log.info('Status: {}, Job: {}'.format(job.get_status(), job))
 
             # Get additional logs from database store
@@ -60,7 +72,10 @@ def get_job_status(job_id):
                           }
             # Check Results 
             result = job.latest_result()
-            if result == result.Type.SUCCESSFUL: 
+
+            log.info('Result: {}'.format(result.return_value))
+            log.info('Result: {}'.format(result))
+            if result.type == result.Type.SUCCESSFUL: 
                 jobs_data["results"] = result.return_value
             else: 
                 jobs_data["results"] = result.exc_string

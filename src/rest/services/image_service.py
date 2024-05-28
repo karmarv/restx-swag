@@ -37,13 +37,16 @@ reqp_ib_qr.add_argument('name',        type=str, default=None, required=False, h
 class ImageBlob(Resource):
     @api.expect(reqp_ib_qr)
     def get(self):
-        """Returns image blob based on name substring match."""
+        """Returns image blob based on name substring match. `Unauthenticated` for search purposes. Set the Response content type to `image/jpeg` for image download link."""
         try:
             args = reqp_ib_qr.parse_args()
             #data = dbmodel.read_image_metadata(args.get('name'))
             filename = args.get('name')
             filepath = utils.find_file(filename)
             log.info("Found: {}".format(filepath))
+            if filepath is None: 
+                return "Unable to find " + filename, 404
+
             return {"directory":os.path.dirname(filepath), "filename": os.path.basename(filepath)}
         except KeyError as e:
             api.abort(500, e.__doc__, status = "Could not retrieve information", statusCode = "500")
@@ -51,7 +54,8 @@ class ImageBlob(Resource):
             api.abort(400, e.__doc__, status = "Could not retrieve information"+str(e), statusCode = "400")
 
     @api.expect(reqp_ib_up)
-    def post(self):
+    @token_required
+    def post(self, current_user):
         """Uploads a new file to the flask server."""
         try:
             args = reqp_ib_up.parse_args()
@@ -84,10 +88,10 @@ reqp_md_up.add_argument('overwrite',   type=bool, default=False,  required=False
 class ImageMetadata(Resource):
     @api.expect(reqp_md_qr)
     def get(self):
-        """Returns list of asset image link based on name substring match."""
+        """List image metadata based on name substring match. `Unauthenticated` for search purposes"""
         try:
             args = reqp_md_qr.parse_args()
-            data = dbmodel.read_image_metadata(args.get('name'))
+            data = dbmodel.read_image_metadata_by_name(args.get('name'))
             response = make_response(data)
             response.mimetype = 'application/json'
             return response
@@ -99,7 +103,7 @@ class ImageMetadata(Resource):
     @api.expect(reqp_md_up)
     @token_required
     def post(self, current_user):
-        """Uploads a new file to the flask server."""
+        """Create a new image metadata entry."""
         try:
             args = reqp_md_up.parse_args()
             file_path = args.get('file')
@@ -114,4 +118,25 @@ class ImageMetadata(Resource):
             api.abort(500, e.__doc__, status = "Could not retrieve information", statusCode = "500")
         except Exception as e:
             api.abort(400, e.__doc__, status = "Could not retrieve information"+str(e), statusCode = "400")  
-       
+
+@api.route('/metadata/<string:image_id>')
+class ImageMetadataItem(Resource):
+    @token_required
+    def get(self, image_id, current_user):
+        """Fetch an image metadata. image_id must exist in database"""
+        try:
+            data = dbmodel.read_image_metadata(image_id)
+            response = make_response(data)
+            response.mimetype = 'application/json'
+            return response
+        except KeyError as e:
+            api.abort(500, e.__doc__, status = "Could not retrieve information", statusCode = "500")
+        except Exception as e:
+            api.abort(400, e.__doc__, status = "Could not retrieve information"+str(e), statusCode = "400")       
+
+    @token_required
+    def delete(self, image_id, current_user):
+        """Delete an image metadata entry"""
+        dbmodel.del_image_metadata(image_id)
+        return
+
