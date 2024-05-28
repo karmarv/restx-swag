@@ -41,8 +41,7 @@ def run(job_metadata):
 
         # Step 1: Wrap algorithm & execute as a sync process
         pprint("Execute worker job with metadata --> {}".format(job_metadata))
-        job_metadata["result"] = len(str(job_metadata["data"]))
-        job_metadata["content_type"] = "count"
+        job_metadata["result"] = { "length" : len(str(job_metadata["data"])) }
 
         # Step 2: log status update in database
         job_metadata["status"] = REDIS_JOB_STATUS[2]
@@ -57,11 +56,11 @@ def run(job_metadata):
     # Job Cleanup
     job_metadata["status"] = REDIS_JOB_STATUS[3]
     log_str = log_str + "{} - Job Completed; ".format(time)
-    pprint("Job {} --> {}".format(job_metadata["content_type"], job_metadata["result"]))
+    pprint("Job {} --> {}".format(job_id, job_metadata["result"]))
 
     # Job State - End
     # Update metadata with results information
     job_metadata["time_updated"] = "{}".format(time)
 
     #data_json = json.dumps(job_metadata)
-    return job_metadata
+    return job_metadata["result"]

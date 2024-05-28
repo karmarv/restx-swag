@@ -71,3 +71,23 @@ def delete_job_metadata(job_id):
     db.session.delete(obj)
     db.session.commit()
     return
+
+def update_job_metadata_success(job_id, result):
+    """Update an entry from job metadata table"""
+    obj = JobMetadata.query.filter(JobMetadata.id==job_id).one()
+    obj.result = result
+    obj.status = config.REDIS_JOB_STATUS[3]
+    obj.time_updated = datetime.datetime.now(datetime.timezone.UTC)
+    db.session.flush()
+    db.session.commit()
+    return
+
+def update_job_metadata_failure(job_id, error):
+    """Update an entry from job metadata table"""
+    obj = JobMetadata.query.filter(JobMetadata.id==job_id).one()
+    obj.result = error
+    obj.status = config.REDIS_JOB_STATUS[4]
+    obj.time_updated = datetime.datetime.now(datetime.timezone.UTC)
+    db.session.flush()
+    db.session.commit()
+    return

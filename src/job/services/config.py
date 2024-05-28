@@ -19,7 +19,7 @@ SERVER_START_TIME = datetime.now()
 REDIS_URL         = os.getenv("REDIS_URL", "redis://0.0.0.0:6379/0")
 REDIS_QUEUES      = ["default"]
 REDIS_JOB_PREFIX  = "job"
-REDIS_JOB_STATUS  = ["enqueued", "started", "running", "finished", "error"]
+REDIS_JOB_STATUS  = ["enqueued", "started", "running", "completed", "error"]
 REDIS_JOB_TIMEOUT = 3600*8   # 08 Hours - Each worker job timeout as handled by RQ
 REDIS_JOB_TTL     = 3600*24  # 24 Hours - RQ result state information time to live 
 
