@@ -14,17 +14,9 @@ from job.services import config
 
 log = logging.getLogger("job")
 
-def report_success(job, connection, result, *args, **kwargs):
-    """Success callback upon completion of Job. This context is executed by the worker so does not have SQL database connection objects"""
-    key = "rq:results:json:{}".format(job.id)
-    connection.set(key, json.dumps(result, default=str), ex=60)
-    pass
+module_success_handler="worker.work_utils.report_success"
+module_failure_handler="worker.work_utils.report_failure"
 
-def report_failure(job, connection, type, value, traceback):
-    """Failure callback upon error of Job. This context is executed by the worker so does not have SQL database connection objects"""
-    key = "rq:results:failed:{}".format(job.id)
-    connection.set(key, str(traceback.format_exc()), ex=60)
-    pass
 
 def submit_job(metadata):
     """ 
@@ -39,10 +31,10 @@ def submit_job(metadata):
             q = Queue(job_queue)
             rqjob = q.enqueue(job_module, metadata, 
                                    job_id=job_id, 
-                                   #job_timeout=config.REDIS_JOB_TIMEOUT,
-                                   #result_ttl=config.REDIS_JOB_TTL,
-                                   on_success=Callback(report_success), # default callback timeout (60 seconds) 
-                                   on_failure=Callback(report_failure, timeout=10), # 10 seconds timeout
+                                   job_timeout=config.REDIS_JOB_TIMEOUT,
+                                   result_ttl=config.REDIS_JOB_TTL,
+                                   on_success=Callback(module_success_handler), # default callback timeout (60 seconds) 
+                                   on_failure=Callback(module_failure_handler, timeout=10), # 10 seconds timeout
                                    )
         log.info("Submitted Job: {}".format(rqjob))
     except Exception as e:
